@@ -17,12 +17,12 @@ class EnsureUserAndTenantExist
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $username = $request->query('username');
-        $serverUrl = $request->query('serverUrl');
+        $username = $request->header('APP-USERNAME');
+        $serverUrl = $request->header('APP-SERVER-URL');
 
         if (!$username || !$serverUrl) {
             return response()->json([
-                'message' => 'username and serverUrl params are required'
+                'message' => 'APP-USERNAME and APP-SERVER-URL headers are required'
             ], 400);
         }
 
