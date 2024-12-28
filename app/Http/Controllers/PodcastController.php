@@ -3,16 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Podcast;
+use App\Services\PodcastService;
 use Illuminate\Http\Request;
 use willvincent\Feeds\Facades\FeedsFacade;
 
 class PodcastController extends Controller
 {
+    protected $podcastService;
+
+    public function __construct(PodcastService $podcastService)
+    {
+        $this->podcastService = $podcastService;
+    }
+
     public function index(Request $request)
     {
         $user = $request->user;
 
-        $podcasts = $user->podcasts()->get()->where('is_visible', true);
+        $podcasts = $this->podcastService->getPodcasts($user);
 
         return response()->json($podcasts, 200);
     }
@@ -23,47 +31,14 @@ class PodcastController extends Controller
             'feed_url' => 'required|url',
         ]);
 
-        $podcast = Podcast::where('feed_url', $validated['feed_url'])->first();
-
-        if ($podcast) {
-            $user = $request->user;
-            $podcastIsAlreadyLinked = $user->podcasts()->where('podcast_id', $podcast->id)->exists();
-
-            if (!$podcastIsAlreadyLinked) {
-                $user->podcasts()->attach($podcast->id);
-            }
-
-            return response()->json($podcast, 201);
-        }
-
         try {
-            $feed = FeedsFacade::make($validated['feed_url']);
-
-            $title = $feed->get_title();
-            $description = $feed->get_description();
-            $author = $feed->get_author()->name;
-            $link = $feed->get_link();
-            $image_url = $feed->get_image_url();
-
-            $podcast = Podcast::create([
-                'title' => $title,
-                'description' => $description,
-                'author' => $author,
-                'link' => $link,
-                'image_url' => $image_url,
-                'feed_url' => $validated['feed_url'],
-            ]);
-
-            $podcast->refresh();
-
             $user = $request->user;
-            $user->podcasts()->attach($podcast->id);
+            $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
 
             return response()->json($podcast, 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Erro ao ler o feed. Verifique a URL e tente novamente.',
-                'error' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -72,15 +47,14 @@ class PodcastController extends Controller
     {
         $user = $request->user;
 
-        $podcastIsLinked = $user->podcasts()->where('podcast_id', $podcastId)->exists();
-        if (!$podcastIsLinked) {
+        try {
+            $this->podcastService->destroyPodcast($user, $podcastId);
+
+            return response()->noContent();
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => "The podcast #{$podcastId} is not associated with this user",
+                'message' => $e->getMessage(),
             ], 404);
         }
-
-        $user->podcasts()->detach($podcastId);
-
-        return response()->noContent();
     }
 }
