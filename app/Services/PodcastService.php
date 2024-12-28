@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
 use willvincent\Feeds\Facades\FeedsFacade;
@@ -45,8 +46,11 @@ class PodcastService
                 'image_url' => $image_url,
                 'feed_url' => $feedUrl,
             ]);
+            $podcast->refresh();
 
             $user->podcasts()->attach($podcast->id);
+
+            ProcessPodcastEpisodes::dispatch($podcast);
 
             return $podcast;
         } catch (Exception $e) {
