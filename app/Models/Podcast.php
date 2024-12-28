@@ -28,4 +28,9 @@ class Podcast extends Model
     {
         return $this->belongsToMany(User::class, 'user_podcast');
     }
+
+    public function episodes()
+    {
+        return $this->hasMany(Episode::class)->orderBy('published_at', 'desc');
+    }
 }

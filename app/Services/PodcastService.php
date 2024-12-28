@@ -15,6 +15,20 @@ class PodcastService
         return $user->podcasts()->where('is_visible', true)->get();
     }
 
+    public function getPodcastWithEpisodes(User $user, $podcastId)
+    {
+        $podcast = Podcast::with('episodes')
+            ->where('id', $podcastId)
+            ->where('is_visible', true)
+            ->first();
+
+        if (!$podcast) {
+            throw new Exception("Podcast #{$podcastId} not found");
+        }
+
+        return $podcast;
+    }
+
     public function storePodcast($user, $feedUrl)
     {
         $podcast = Podcast::where('feed_url', $feedUrl)->first();

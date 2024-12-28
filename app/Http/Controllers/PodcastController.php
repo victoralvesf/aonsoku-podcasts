@@ -25,6 +25,21 @@ class PodcastController extends Controller
         return response()->json($podcasts, 200);
     }
 
+    public function show(Request $request, $podcastId)
+    {
+        try {
+            $user = $request->user;
+
+            $podcast = $this->podcastService->getPodcastWithEpisodes($user, $podcastId);
+
+            return response()->json($podcast, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+        }
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
