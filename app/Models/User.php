@@ -25,4 +25,9 @@ class User extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
+
+    public function podcasts()
+    {
+        return $this->belongsToMany(Podcast::class, 'user_podcast');
+    }
 }
