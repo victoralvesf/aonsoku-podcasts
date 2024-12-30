@@ -17,7 +17,6 @@ class PodcastController extends Controller
     public function index(Request $request)
     {
         $user = $request->user;
-
         $podcasts = $this->podcastService->getPodcasts($user);
 
         return response()->json($podcasts, 200);
@@ -25,17 +24,10 @@ class PodcastController extends Controller
 
     public function show(Request $request, $podcastId)
     {
-        try {
-            $user = $request->user;
+        $user = $request->user;
+        $podcast = $this->podcastService->getPodcastWithEpisodes($user, $podcastId);
 
-            $podcast = $this->podcastService->getPodcastWithEpisodes($user, $podcastId);
-
-            return response()->json($podcast, 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 404);
-        }
+        return response()->json($podcast, 200);
     }
 
     public function store(Request $request)
@@ -44,30 +36,17 @@ class PodcastController extends Controller
             'feed_url' => 'required|url',
         ]);
 
-        try {
-            $user = $request->user;
-            $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
+        $user = $request->user;
+        $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
 
-            return response()->json($podcast, 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json($podcast, 201);
     }
 
     public function destroy(Request $request, $podcastId)
     {
         $user = $request->user;
+        $this->podcastService->destroyPodcast($user, $podcastId);
 
-        try {
-            $this->podcastService->destroyPodcast($user, $podcastId);
-
-            return response()->noContent();
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 404);
-        }
+        return response()->noContent();
     }
 }

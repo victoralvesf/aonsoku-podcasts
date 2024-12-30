@@ -6,7 +6,8 @@ use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
 use willvincent\Feeds\Facades\FeedsFacade;
-use Exception;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class PodcastService
 {
@@ -17,13 +18,19 @@ class PodcastService
 
     public function getPodcastWithEpisodes(User $user, $podcastId)
     {
+        $userFollowsThePodcast = $user->podcasts()->where('podcast_id', $podcastId)->exists();
+
+        if (!$userFollowsThePodcast) {
+            throw new NotFoundHttpException("Podcast #{$podcastId} not found for this user");
+        }
+
         $podcast = Podcast::with('episodes')
             ->where('id', $podcastId)
             ->where('is_visible', true)
             ->first();
 
         if (!$podcast) {
-            throw new Exception("Podcast #{$podcastId} not found");
+            throw new NotFoundHttpException("Podcast #{$podcastId} not found");
         }
 
         return $podcast;
@@ -34,9 +41,9 @@ class PodcastService
         $podcast = Podcast::where('feed_url', $feedUrl)->first();
 
         if ($podcast) {
-            $podcastIsLinked = $user->podcasts()->where('podcast_id', $podcast->id)->exists();
+            $userFollowsThePodcast = $user->podcasts()->where('podcast_id', $podcast->id)->exists();
 
-            if (!$podcastIsLinked) {
+            if (!$userFollowsThePodcast) {
                 $user->podcasts()->attach($podcast->id);
             }
 
@@ -67,8 +74,8 @@ class PodcastService
             ProcessPodcastEpisodes::dispatch($podcast);
 
             return $podcast;
-        } catch (Exception $e) {
-            throw new Exception('Error reading the feed. Please check the URL and try again.');
+        } catch (\Exception) {
+            throw new UnprocessableEntityHttpException('Error reading the feed. Please check the URL and try again.');
         }
     }
 
@@ -77,7 +84,7 @@ class PodcastService
         $podcastIsLinked = $user->podcasts()->where('podcast_id', $podcastId)->exists();
 
         if (!$podcastIsLinked) {
-            throw new Exception("The podcast #{$podcastId} is not associated with this user");
+            throw new UnprocessableEntityHttpException("The podcast #{$podcastId} is not associated with this user");
         }
 
         $user->podcasts()->detach($podcastId);
