@@ -17,11 +17,13 @@ return new class extends Migration
             $table->foreignIdFor(Podcast::class, 'podcast_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description');
-            $table->string('audio_url')->unique();
+            $table->string('audio_url');
             $table->string('image_url');
             $table->integer('duration');
             $table->dateTime('published_at');
             $table->timestamps();
+
+            $table->unique(['podcast_id', 'audio_url']);
         });
     }
 
