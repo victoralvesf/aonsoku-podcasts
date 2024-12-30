@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Podcast\ShowFilterRequest;
 use App\Services\PodcastService;
 use Illuminate\Http\Request;
 
@@ -22,10 +23,12 @@ class PodcastController extends Controller
         return response()->json($podcasts, 200);
     }
 
-    public function show(Request $request, $podcastId)
+    public function show(ShowFilterRequest $request, $podcastId)
     {
         $user = $request->user;
-        $podcast = $this->podcastService->getPodcastWithEpisodes($user, $podcastId);
+        $filters = $request->validated();
+
+        $podcast = $this->podcastService->getPodcastWithEpisodes($user, $podcastId, $filters);
 
         return response()->json($podcast, 200);
     }

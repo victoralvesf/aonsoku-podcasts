@@ -16,7 +16,7 @@ class PodcastService
         return $user->podcasts()->where('is_visible', true)->get();
     }
 
-    public function getPodcastWithEpisodes(User $user, $podcastId)
+    public function getPodcastWithEpisodes(User $user, string $podcastId, array $filters)
     {
         $userFollowsThePodcast = $user->podcasts()->where('podcast_id', $podcastId)->exists();
 
@@ -24,8 +24,7 @@ class PodcastService
             throw new NotFoundHttpException("Podcast #{$podcastId} not found for this user");
         }
 
-        $podcast = Podcast::with('episodes')
-            ->where('id', $podcastId)
+        $podcast = Podcast::where('id', $podcastId)
             ->where('is_visible', true)
             ->first();
 
@@ -33,10 +32,34 @@ class PodcastService
             throw new NotFoundHttpException("Podcast #{$podcastId} not found");
         }
 
-        return $podcast;
+        // Episodes Filters
+        $perPage = 20;
+        $sort = 'desc';
+        $orderBy = 'published_at';
+
+        if (!empty($filters['per_page'])) {
+            $perPage = intval($filters['per_page']);
+        }
+
+        if (!empty($filters['sort'])) {
+            $sort = $filters['sort'];
+        }
+
+        if (!empty($filters['order_by'])) {
+            $orderBy = $filters['order_by'];
+        }
+
+        $episodes = $podcast->episodes()
+            ->orderBy($orderBy, $sort)
+            ->simplePaginate($perPage);
+
+        return [
+            'podcast' => $podcast,
+            'episodes' => $episodes,
+        ];
     }
 
-    public function storePodcast($user, $feedUrl)
+    public function storePodcast(User $user, string $feedUrl)
     {
         $podcast = Podcast::where('feed_url', $feedUrl)->first();
 
@@ -79,7 +102,7 @@ class PodcastService
         }
     }
 
-    public function destroyPodcast($user, $podcastId)
+    public function destroyPodcast(User $user, string $podcastId)
     {
         $podcastIsLinked = $user->podcasts()->where('podcast_id', $podcastId)->exists();
 
