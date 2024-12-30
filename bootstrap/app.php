@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Middleware\EnsureUserAndTenantExist;
+use App\Http\Middleware\JsonMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,21 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(EnsureUserAndTenantExist::class);
+        $middleware->append([
+            JsonMiddleware::class,
+            EnsureUserAndTenantExist::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->renderable(function (NotFoundHttpException $e, $request) {
-            return response()->json([
-                'message' => 'Not Found',
-                'status' => 404,
-            ], 404);
-        });
-
-        $exceptions->renderable(function (Throwable $e, $request) {
-            return response()->json([
-                'message' => 'Internal Error',
-                'status' => 500,
-                'debug' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
-        });
+        //
     })->create();
