@@ -7,14 +7,14 @@ use SimplePie\SimplePie;
 
 class PodcastItemHelper
 {
-    public static function getItunesImage(SimplePieItem $item)
+    public static function getItunesImage(SimplePieItem $item, string $defaultImage)
     {
         $images = $item->get_item_tags(SimplePie::NAMESPACE_ITUNES, 'image');
 
         if (!empty($images)) {
             return $images[0]['attribs']['']['href'];
         } else {
-            return $item->get_feed()->get_image_url();
+            return $defaultImage;
         }
     }
 

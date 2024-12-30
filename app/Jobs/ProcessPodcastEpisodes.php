@@ -39,30 +39,39 @@ class ProcessPodcastEpisodes implements ShouldQueue
             $feed = FeedsFacade::make($this->podcast->feed_url);
 
             $reversedItems = array_reverse($feed->get_items());
+            $podcastImage = $feed->get_image_url();
 
             foreach ($reversedItems as $item) {
-                $audioUrlExists = Episode::where('audio_url', $item->get_permalink())->exists();
+                try {
+                    $audioUrlExists = Episode::where('audio_url', $item->get_permalink())->exists();
 
-                if ($audioUrlExists) {
-                    continue;
+                    if ($audioUrlExists) {
+                        continue;
+                    }
+
+                    Episode::create([
+                        'podcast_id' => $this->podcast->id,
+                        'title' => $item->get_title(),
+                        'description' => $item->get_content(),
+                        'audio_url' => $item->get_enclosure()->get_link(),
+                        'image_url' => PodcastItemHelper::getItunesImage($item, $podcastImage),
+                        'duration' => PodcastItemHelper::getItunesDuration($item),
+                        'published_at' => $item->get_date('Y-m-d H:i:s'),
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Error processing episode for podcast', [
+                        'podcast_id' => $this->podcast->id,
+                        'episode_title' => $item->get_title(),
+                        'error' => $e->getMessage(),
+                    ]);
                 }
-
-                Episode::create([
-                    'podcast_id' => $this->podcast->id,
-                    'title' => $item->get_title(),
-                    'description' => $item->get_content(),
-                    'audio_url' => $item->get_enclosure()->get_link(),
-                    'image_url' => PodcastItemHelper::getItunesImage($item),
-                    'duration' => PodcastItemHelper::getItunesDuration($item),
-                    'published_at' => $item->get_date('Y-m-d H:i:s'),
-                ]);
             }
 
             DB::table('podcasts')
                 ->where('id', $this->podcast->id)
                 ->update(['is_visible' => 1]);
         } catch (\Exception $e) {
-            Log::error('Error processing episodes for podcast', [
+            Log::error('Error processing job processing for podcast episodes', [
                 'id' => $this->podcast->id,
                 'title' => $this->podcast->title,
                 'error' => $e->getMessage(),
