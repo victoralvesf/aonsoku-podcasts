@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Podcast;
 use App\Services\PodcastService;
 use Illuminate\Http\Request;
-use willvincent\Feeds\Facades\FeedsFacade;
 
 class PodcastController extends Controller
 {
