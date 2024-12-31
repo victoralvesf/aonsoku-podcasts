@@ -3,7 +3,7 @@
 use App\Http\Controllers\PodcastController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('podcast')->group(function () {
+Route::prefix('podcasts')->group(function () {
     Route::get('/', [PodcastController::class, 'index']);
     Route::get('/{id}', [PodcastController::class, 'show']);
     Route::post('/', [PodcastController::class, 'store']);
