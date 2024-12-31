@@ -2,11 +2,25 @@
 
 namespace App\Helpers;
 
+use App\Models\Podcast;
 use SimplePie\Item as SimplePieItem;
 use SimplePie\SimplePie;
 
 class PodcastItemHelper
 {
+    public static function formatEpisode(SimplePieItem $item, Podcast $podcast)
+    {
+        return [
+            'podcast_id' => $podcast->id,
+            'title' => $item->get_title(),
+            'description' => $item->get_description() ?? '',
+            'audio_url' => $item->get_enclosure()->get_link(),
+            'image_url' => self::getItunesImage($item, $podcast->image_url),
+            'duration' => self::getItunesDuration($item),
+            'published_at' => $item->get_date('Y-m-d H:i:s'),
+        ];
+    }
+
     public static function getItunesImage(SimplePieItem $item, string $defaultImage)
     {
         $images = $item->get_item_tags(SimplePie::NAMESPACE_ITUNES, 'image');
@@ -20,10 +34,16 @@ class PodcastItemHelper
 
     public static function getItunesDuration(SimplePieItem $item)
     {
-        $duration = $item->get_item_tags(\SimplePie\SimplePie::NAMESPACE_ITUNES, 'duration')[0];
-        $durationValue = is_array($duration) ? $duration['data'] : $duration;
+        $duration = $item->get_item_tags(\SimplePie\SimplePie::NAMESPACE_ITUNES, 'duration');
 
-        return PodcastItemHelper::convertDurationToSeconds($durationValue);
+        if (is_array($duration) && !empty($duration)) {
+            $durationItem = $duration[0];
+            $durationValue = is_array($durationItem) ? $durationItem['data'] : $durationItem;
+
+            return self::convertDurationToSeconds($durationValue);
+        }
+
+        return 0;
     }
 
     public static function convertDurationToSeconds($duration)

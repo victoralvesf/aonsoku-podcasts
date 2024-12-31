@@ -48,15 +48,9 @@ class ProcessPodcastEpisodes implements ShouldQueue
                         continue;
                     }
 
-                    Episode::create([
-                        'podcast_id' => $this->podcast->id,
-                        'title' => $item->get_title(),
-                        'description' => $item->get_description() ?? '',
-                        'audio_url' => $item->get_enclosure()->get_link(),
-                        'image_url' => PodcastItemHelper::getItunesImage($item, $podcastImage),
-                        'duration' => PodcastItemHelper::getItunesDuration($item),
-                        'published_at' => $item->get_date('Y-m-d H:i:s'),
-                    ]);
+                    $episode = PodcastItemHelper::formatEpisode($item, $this->podcast);
+
+                    Episode::create($episode);
                 } catch (\Exception $e) {
                     Log::warning('Error processing episode for podcast', [
                         'podcast_id' => $this->podcast->id,
