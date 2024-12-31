@@ -77,9 +77,9 @@ class PodcastService
             $feed = FeedsFacade::make($feedUrl);
 
             $title = $feed->get_title();
-            $description = $feed->get_description();
-            $author = $feed->get_author()->name;
-            $link = $feed->get_link();
+            $description = $feed->get_description() ?? '';
+            $author = $feed->get_author()->name ?? '';
+            $link = $feed->get_link() ?? '';
             $image_url = $feed->get_image_url();
 
             $podcast = Podcast::create([
