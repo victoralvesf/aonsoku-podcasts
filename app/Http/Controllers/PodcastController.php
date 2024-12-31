@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Podcast\SearchFilterRequest;
 use App\Http\Requests\Podcast\ShowFilterRequest;
 use App\Services\PodcastService;
 use Illuminate\Http\Request;
@@ -43,6 +44,16 @@ class PodcastController extends Controller
         $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
 
         return response()->json($podcast, 201);
+    }
+
+    public function search(SearchFilterRequest $request)
+    {
+        $user = $request->user;
+        $filters = $request->validated();
+
+        $result = $this->podcastService->search($user, $filters);
+
+        return response()->json($result, 200);
     }
 
     public function destroy(Request $request, $podcastId)

@@ -112,4 +112,24 @@ class PodcastService
 
         $user->podcasts()->detach($podcastId);
     }
+
+    public function search(User $user, array $filters)
+    {
+        $perPage = 20;
+
+        if (!empty($filters['per_page'])) {
+            $perPage = $filters['per_page'];
+        }
+
+        $searchQuery = "%{$filters['query']}%";
+
+        $podcasts = $user->podcasts()
+            ->where(function ($query) use ($searchQuery) {
+                $query->where('title', 'like', $searchQuery)
+                    ->orWhere('description', 'like', $searchQuery);
+            })
+            ->simplePaginate($perPage);
+
+        return $podcasts;
+    }
 }
