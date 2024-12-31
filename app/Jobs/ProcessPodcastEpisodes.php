@@ -10,7 +10,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use willvincent\Feeds\Facades\FeedsFacade;
 
@@ -67,9 +66,7 @@ class ProcessPodcastEpisodes implements ShouldQueue
                 }
             }
 
-            DB::table('podcasts')
-                ->where('id', $this->podcast->id)
-                ->update(['is_visible' => 1]);
+            Podcast::where('id', $this->podcast->id)->update(['is_visible' => true]);
         } catch (\Exception $e) {
             Log::error('Error processing job processing for podcast episodes', [
                 'id' => $this->podcast->id,

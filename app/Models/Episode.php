@@ -19,6 +19,17 @@ class Episode extends Model
         'published_at',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($episode) {
+            $episode->podcast->increment('episode_count');
+        });
+
+        static::deleted(function ($episode) {
+            $episode->podcast->decrement('episode_count');
+        });
+    }
+
     public function podcast()
     {
         return $this->belongsTo(Podcast::class);

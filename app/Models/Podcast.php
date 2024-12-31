@@ -16,10 +16,13 @@ class Podcast extends Model
         'link',
         'image_url',
         'feed_url',
+        'is_visible',
+        'episode_count',
     ];
 
     protected $casts = [
         'is_visible' => 'boolean',
+        'episode_count' => 'integer',
     ];
 
     protected $hidden = ['pivot'];
