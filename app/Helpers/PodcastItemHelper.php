@@ -17,7 +17,7 @@ class PodcastItemHelper
             'audio_url' => $item->get_enclosure()->get_link(),
             'image_url' => self::getItunesImage($item, $podcast->image_url),
             'duration' => self::getItunesDuration($item),
-            'published_at' => $item->get_date('Y-m-d H:i:s'),
+            'published_at' => self::getPublishDate($item),
         ];
     }
 
@@ -44,6 +44,11 @@ class PodcastItemHelper
         }
 
         return 0;
+    }
+
+    public static function getPublishDate(SimplePieItem $item)
+    {
+        return $item->get_date('Y-m-d H:i:s');
     }
 
     public static function convertDurationToSeconds($duration)
