@@ -37,13 +37,25 @@ class PodcastController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'feed_url' => 'required|url',
+            'feed_url' => 'nullable|string|url|required_without:feed_urls',
+            'feed_urls' => 'nullable|array|required_without:feed_url',
+            'feed_urls.*' => 'url',
         ]);
 
         $user = $request->user;
-        $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
 
-        return response()->json($podcast, 201);
+        if (!empty($validated['feed_url'])) {
+            $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
+            return response()->json($podcast, 201);
+        }
+
+        if (!empty($validated['feed_urls'])) {
+            $podcasts = [];
+            foreach ($validated['feed_urls'] as $feedUrl) {
+                $podcasts[] = $this->podcastService->storePodcast($user, $feedUrl);
+            }
+            return response()->json($podcasts, 201);
+        }
     }
 
     public function search(SearchFilterRequest $request)
