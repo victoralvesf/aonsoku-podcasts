@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\FilterHelper;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
@@ -32,26 +33,11 @@ class PodcastService
             throw new NotFoundHttpException("Podcast #{$podcastId} not found");
         }
 
-        // Episodes Filters
-        $perPage = 20;
-        $sort = 'desc';
-        $orderBy = 'published_at';
-
-        if (!empty($filters['per_page'])) {
-            $perPage = intval($filters['per_page']);
-        }
-
-        if (!empty($filters['sort'])) {
-            $sort = $filters['sort'];
-        }
-
-        if (!empty($filters['order_by'])) {
-            $orderBy = $filters['order_by'];
-        }
+        $filters = new FilterHelper($filters);
 
         $episodes = $podcast->episodes()
-            ->orderBy($orderBy, $sort)
-            ->simplePaginate($perPage);
+            ->orderBy($filters->getOrderBy(), $filters->getSort())
+            ->simplePaginate($filters->getPerPage());
 
         return [
             'podcast' => $podcast,
@@ -115,20 +101,27 @@ class PodcastService
 
     public function search(User $user, array $filters)
     {
-        $perPage = 20;
-
-        if (!empty($filters['per_page'])) {
-            $perPage = $filters['per_page'];
-        }
-
-        $searchQuery = "%{$filters['query']}%";
+        $filters = new FilterHelper($filters);
 
         $podcasts = $user->podcasts()
-            ->where(function ($query) use ($searchQuery) {
-                $query->where('title', 'like', $searchQuery)
-                    ->orWhere('description', 'like', $searchQuery);
+            ->where(function ($query) use ($filters) {
+                $searchQuery = $filters->getSearchQuery();
+                $filterBy = $filters->getFilterBy();
+
+                switch ($filterBy) {
+                    case 'title':
+                        $query->where('title', 'like', $searchQuery);
+                        break;
+                    case 'description':
+                        $query->where('description', 'like', $searchQuery);
+                        break;
+                    default:
+                        $query->where('title', 'like', $searchQuery)
+                            ->orWhere('description', 'like', $searchQuery);
+                        break;
+                }
             })
-            ->simplePaginate($perPage);
+            ->simplePaginate($filters->getPerPage());
 
         return $podcasts;
     }
