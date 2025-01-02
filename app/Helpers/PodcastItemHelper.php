@@ -25,11 +25,13 @@ class PodcastItemHelper
     {
         $images = $item->get_item_tags(SimplePie::NAMESPACE_ITUNES, 'image');
 
-        if (!empty($images)) {
-            return $images[0]['attribs']['']['href'];
-        } else {
+        if (empty($images) || !isset($images[0]['attribs']['']['href'])) {
             return $defaultImage;
         }
+
+        $url = $images[0]['attribs']['']['href'];
+
+        return !empty($url) ? $url : $defaultImage;
     }
 
     public static function getItunesDuration(SimplePieItem $item)
