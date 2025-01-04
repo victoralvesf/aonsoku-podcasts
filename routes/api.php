@@ -13,4 +13,5 @@ Route::prefix('podcasts')->group(function () {
     Route::delete('/{id}', [PodcastController::class, 'destroy']);
 
     Route::get('/{id}/episodes/search', [EpisodeController::class, 'search']);
+    Route::get('/episodes/latest', [EpisodeController::class, 'latest']);
 });

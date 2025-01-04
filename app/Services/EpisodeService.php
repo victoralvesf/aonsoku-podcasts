@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Helpers\FilterHelper;
+use App\Models\Episode;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EpisodeService
@@ -43,5 +45,19 @@ class EpisodeService
             ->simplePaginate($filters->getPerPage());
 
         return $episodes;
+    }
+
+    public function getLatestEpisodes(User $user)
+    {
+        $followedPodcastIds = DB::table('user_podcast')
+            ->select('podcast_id')
+            ->where('user_id', $user->id);
+
+        $latestEpisodes = Episode::whereIn('podcast_id', $followedPodcastIds)
+            ->orderBy('published_at', 'desc')
+            ->take(50)
+            ->get();
+
+        return $latestEpisodes;
     }
 }

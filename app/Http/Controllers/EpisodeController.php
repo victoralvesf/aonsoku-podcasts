@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Episode\SearchFilterRequest;
 use App\Services\EpisodeService;
+use Illuminate\Http\Request;
 
 class EpisodeController extends Controller
 {
@@ -20,6 +21,15 @@ class EpisodeController extends Controller
         $filters = $request->validated();
 
         $episodes = $this->episodeService->searchPodcastEpisodes($user, $podcastId, $filters);
+
+        return response()->json($episodes, 200);
+    }
+
+    public function latest(Request $request)
+    {
+        $user = $request->user;
+
+        $episodes = $this->episodeService->getLatestEpisodes($user);
 
         return response()->json($episodes, 200);
     }
