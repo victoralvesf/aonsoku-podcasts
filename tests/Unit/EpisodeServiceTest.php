@@ -200,7 +200,7 @@ class EpisodeServiceTest extends TestCase
     }
 
     #[Test]
-    public function itFailsIfEpisodeDoesNotExist()
+    public function itShouldFailWhenTryingToUpdateProgressForANonExistentEpisode()
     {
         $user = User::factory()->create();
 
