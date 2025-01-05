@@ -36,6 +36,9 @@ class PodcastService
         $filters = new FilterHelper($filters);
 
         $episodes = $podcast->episodes()
+            ->with(['playback' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
             ->orderBy($filters->getOrderBy(), $filters->getSort())
             ->simplePaginate($filters->getPerPage());
 

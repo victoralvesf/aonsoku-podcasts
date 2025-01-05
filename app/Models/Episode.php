@@ -34,4 +34,9 @@ class Episode extends Model
     {
         return $this->belongsTo(Podcast::class);
     }
+
+    public function playback()
+    {
+        return $this->hasMany(EpisodePlayback::class);
+    }
 }

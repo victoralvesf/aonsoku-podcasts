@@ -33,4 +33,18 @@ class EpisodeController extends Controller
 
         return response()->json($episodes, 200);
     }
+
+    public function progress(Request $request, string $episodeId)
+    {
+        $validated = $request->validate([
+            'progress' => 'required|integer|min:0',
+        ]);
+
+        $user = $request->user;
+        $progress = $validated['progress'];
+
+        $playback = $this->episodeService->updateProgress($user, $episodeId, $progress);
+
+        return response()->json($playback, 200);
+    }
 }
