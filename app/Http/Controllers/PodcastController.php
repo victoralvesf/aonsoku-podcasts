@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Podcast\GetAllFilterRequest;
 use App\Http\Requests\Podcast\SearchFilterRequest;
 use App\Http\Requests\Podcast\ShowFilterRequest;
 use App\Services\PodcastService;
@@ -16,10 +17,12 @@ class PodcastController extends Controller
         $this->podcastService = $podcastService;
     }
 
-    public function index(Request $request)
+    public function index(GetAllFilterRequest $request)
     {
         $user = $request->user;
-        $podcasts = $this->podcastService->getPodcasts($user);
+        $filters = $request->validated();
+
+        $podcasts = $this->podcastService->getPodcasts($user, $filters);
 
         return response()->json($podcasts, 200);
     }

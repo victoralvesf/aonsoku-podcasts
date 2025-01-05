@@ -12,9 +12,13 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class PodcastService
 {
-    public function getPodcasts(User $user)
+    public function getPodcasts(User $user, array $filters)
     {
-        return $user->podcasts()->where('is_visible', true)->get();
+        $filters = new FilterHelper($filters);
+
+        return $user->podcasts()
+            ->where('is_visible', true)
+            ->simplePaginate($filters->getPerPage());
     }
 
     public function getPodcastWithEpisodes(User $user, string $podcastId, array $filters)
