@@ -183,4 +183,91 @@ class PodcastServiceTest extends TestCase
         $this->expectException(UnprocessableEntityHttpException::class);
         $this->podcastService->destroyPodcast($user, $podcast->id);
     }
+
+    #[Test]
+    public function itShouldSearchPodcastsByTitle()
+    {
+        $user = User::factory()->create();
+        $fakeText = fake()->sentence(4);
+
+        $podcast1 = Podcast::factory()->create([
+            'title' => $fakeText,
+            'is_visible' => true
+        ]);
+        $podcast2 = Podcast::factory()->create([
+            'description' => $fakeText,
+            'is_visible' => true
+        ]);
+        $user->podcasts()->attach([$podcast1, $podcast2]);
+
+        $filters = [
+            'query' => $fakeText,
+            'filter_by' => 'title'
+        ];
+
+        $podcasts = $this->podcastService->search($user, $filters);
+
+        $this->assertCount(1, $podcasts->items());
+        $this->assertEquals($podcast1->id, $podcasts->items()[0]->id);
+        $this->assertEquals($podcast1->title, $podcasts->items()[0]->title);
+    }
+
+    #[Test]
+    public function itShouldSearchPodcastsByDescription()
+    {
+        $user = User::factory()->create();
+        $fakeText = fake()->sentence(4);
+
+        $podcast1 = Podcast::factory()->create([
+            'description' => $fakeText,
+            'is_visible' => true
+        ]);
+        $podcast2 = Podcast::factory()->create([
+            'title' => $fakeText,
+            'is_visible' => true
+        ]);
+        $user->podcasts()->attach([$podcast1, $podcast2]);
+
+        $filters = [
+            'query' => $fakeText,
+            'filter_by' => 'description'
+        ];
+
+        $podcasts = $this->podcastService->search($user, $filters);
+
+        $this->assertCount(1, $podcasts->items());
+        $this->assertEquals($podcast1->id, $podcasts->items()[0]->id);
+        $this->assertEquals($podcast1->title, $podcasts->items()[0]->title);
+    }
+
+    #[Test]
+    public function itShouldSearchPodcastsByTitleAndDescription()
+    {
+        $user = User::factory()->create();
+        $fakeText = fake()->sentence(4);
+
+        $podcast1 = Podcast::factory()->create([
+            'description' => $fakeText,
+            'is_visible' => true
+        ]);
+        $podcast2 = Podcast::factory()->create([
+            'title' => $fakeText,
+            'is_visible' => true
+        ]);
+        $user->podcasts()->attach([$podcast1, $podcast2]);
+
+        $filters = [
+            'query' => $fakeText,
+            'filter_by' => 'both'
+        ];
+
+        $podcasts = $this->podcastService->search($user, $filters);
+
+        $this->assertCount(2, $podcasts->items());
+        $this->assertEquals($podcast1->id, $podcasts->items()[0]->id);
+        $this->assertEquals($podcast1->title, $podcasts->items()[0]->title);
+
+        $this->assertEquals($podcast2->id, $podcasts->items()[1]->id);
+        $this->assertEquals($podcast2->title, $podcasts->items()[1]->title);
+    }
 }
