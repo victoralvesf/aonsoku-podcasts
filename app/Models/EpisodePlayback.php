@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EpisodePlayback extends Model
 {
@@ -25,12 +26,12 @@ class EpisodePlayback extends Model
         'updated_at',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function episode()
+    public function episode(): BelongsTo
     {
         return $this->belongsTo(Episode::class);
     }

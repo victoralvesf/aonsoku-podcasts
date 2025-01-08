@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Podcast extends Model
 {
@@ -27,12 +29,12 @@ class Podcast extends Model
 
     protected $hidden = ['pivot'];
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_podcast');
     }
 
-    public function episodes()
+    public function episodes(): HasMany
     {
         return $this->hasMany(Episode::class);
     }
