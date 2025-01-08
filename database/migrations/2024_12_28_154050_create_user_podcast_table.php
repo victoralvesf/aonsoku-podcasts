@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('user_podcast', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Podcast::class, 'podcast_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(User::class, 'user_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Podcast::class, 'podcast_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->unique(['user_id', 'podcast_id']);
         });

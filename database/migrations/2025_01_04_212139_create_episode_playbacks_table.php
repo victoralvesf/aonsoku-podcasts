@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('episode_playbacks', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'user_id')->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Episode::class, 'episode_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(User::class, 'user_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Episode::class, 'episode_id')->constrained()->cascadeOnDelete();
             $table->integer('progress')->default(0);
             $table->boolean('completed')->default(false);
             $table->timestamps();

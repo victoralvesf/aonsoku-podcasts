@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('episodes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Podcast::class, 'podcast_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Podcast::class, 'podcast_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
             $table->string('audio_url');
