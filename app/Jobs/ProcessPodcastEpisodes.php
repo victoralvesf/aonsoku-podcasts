@@ -38,7 +38,6 @@ class ProcessPodcastEpisodes implements ShouldQueue
             $feed = FeedsFacade::make($this->podcast->feed_url);
 
             $reversedItems = array_reverse($feed->get_items());
-            $podcastImage = $feed->get_image_url();
 
             foreach ($reversedItems as $item) {
                 try {
@@ -52,7 +51,7 @@ class ProcessPodcastEpisodes implements ShouldQueue
 
                     Episode::create($episode);
                 } catch (\Exception $e) {
-                    Log::warning('Error processing episode for podcast', [
+                    Log::error('Error processing episode for podcast', [
                         'podcast_id' => $this->podcast->id,
                         'episode_title' => $item->get_title(),
                         'error' => $e->getMessage(),
