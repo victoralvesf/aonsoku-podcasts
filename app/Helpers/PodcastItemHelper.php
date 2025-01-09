@@ -36,7 +36,7 @@ class PodcastItemHelper
 
     public static function getItunesDuration(SimplePieItem $item)
     {
-        $duration = $item->get_item_tags(\SimplePie\SimplePie::NAMESPACE_ITUNES, 'duration');
+        $duration = $item->get_item_tags(SimplePie::NAMESPACE_ITUNES, 'duration');
 
         if (is_array($duration) && !empty($duration)) {
             $durationItem = $duration[0];
