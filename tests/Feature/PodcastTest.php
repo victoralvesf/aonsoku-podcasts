@@ -169,7 +169,7 @@ class PodcastTest extends TestCase
         ]);
         $this->user->podcasts()->attach($podcast);
 
-        $url = route('podcasts.show', ['id' => $podcast->id]);
+        $url = route('podcasts.show', ['podcast' => $podcast->id]);
         $response = $this->getJson($url, $this->headers);
 
         $response->assertOk()
@@ -190,7 +190,7 @@ class PodcastTest extends TestCase
             'is_visible' => true
         ]);
 
-        $url = route('podcasts.show', ['id' => $podcast->id]);
+        $url = route('podcasts.show', ['podcast' => $podcast->id]);
         $response = $this->getJson($url, $this->headers);
 
         $response->assertStatus(404);
@@ -199,7 +199,7 @@ class PodcastTest extends TestCase
     #[Test]
     public function itShouldReturnErrorGettingInexistentPodcast()
     {
-        $url = route('podcasts.show', ['id' => 999]);
+        $url = route('podcasts.show', ['podcast' => 999]);
         $response = $this->getJson($url, $this->headers);
 
         $response->assertStatus(404);
@@ -399,7 +399,7 @@ class PodcastTest extends TestCase
         ]);
         $this->user->podcasts()->attach($podcast);
 
-        $url = route('podcasts.destroy', ['id' => $podcast->id]);
+        $url = route('podcasts.destroy', ['podcast' => $podcast->id]);
         $response = $this->deleteJson($url, [], $this->headers);
 
         $response->assertStatus(204);
@@ -412,7 +412,7 @@ class PodcastTest extends TestCase
             'is_visible' => true
         ]);
 
-        $url = route('podcasts.destroy', ['id' => $podcast->id]);
+        $url = route('podcasts.destroy', ['podcast' => $podcast->id]);
         $response = $this->deleteJson($url, [], $this->headers);
 
         $response->assertStatus(422);
