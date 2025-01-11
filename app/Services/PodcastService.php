@@ -6,6 +6,7 @@ use App\Helpers\FilterHelper;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use willvincent\Feeds\Facades\FeedsFacade;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -90,7 +91,11 @@ class PodcastService
             ProcessPodcastEpisodes::dispatch($podcast);
 
             return $podcast;
-        } catch (\Exception) {
+        } catch (\Exception $e) {
+            Log::error('Error reading the feed.', [
+                'feed_url' => $feedUrl,
+                'message' => $e->getMessage(),
+            ]);
             throw new UnprocessableEntityHttpException('Error reading the feed. Please check the URL and try again.');
         }
     }
