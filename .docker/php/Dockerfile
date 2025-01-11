@@ -23,9 +23,6 @@ WORKDIR /var/www/html
 COPY --from=builder /app/vendor /var/www/html/vendor
 COPY . /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && php artisan config:cache \
-    && php artisan route:cache
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
 EXPOSE 9000
