@@ -33,9 +33,11 @@ services:
         volumes:
             - mysql_data:/var/lib/mysql
         healthcheck:
-            test: [ "CMD", "mysql", "-u", "root", "-e", "USE laravel;" ]
-            retries: 3
+            test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent" ]
             interval: 5s
+            timeout: 3s
+            retries: 3
+            start_period: 0s
 
     queue:
         build:
