@@ -29,8 +29,6 @@ services:
         container_name: aonsoku_podcasts_db
         env_file:
             - .env.production
-        ports:
-            - "3306:3306"
         volumes:
             - mysql_data:/var/lib/mysql
 
