@@ -33,7 +33,7 @@ services:
         volumes:
             - mysql_data:/var/lib/mysql
         healthcheck:
-            test: [ "CMD", "mysql", "ping", "-h", "localhost" ]
+            test: [ "CMD", "mysql", "-u", "root", "-e", "USE laravel;" ]
             retries: 3
             interval: 5s
 
