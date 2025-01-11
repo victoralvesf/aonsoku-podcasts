@@ -28,6 +28,10 @@ WORKDIR /var/www/html
 COPY --from=builder /app/vendor /var/www/html/vendor
 COPY . /var/www/html
 
+RUN mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/logs && \
+    chown -R www-data:www-data /var/www/html/storage && \
+    chmod -R 775 /var/www/html/storage
+
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
 EXPOSE 9000

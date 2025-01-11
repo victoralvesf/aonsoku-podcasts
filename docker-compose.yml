@@ -13,7 +13,12 @@ services:
         env_file:
             - .env.production
         command: |
-            bash -c "php artisan migrate --force && php-fpm"
+            bash -c "
+                php artisan migrate --force &&
+                php artisan config:cache &&
+                php artisan route:cache &&
+                php-fpm
+            "
 
     nginx:
         image: nginx:alpine
