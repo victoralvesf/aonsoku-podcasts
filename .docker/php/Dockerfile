@@ -14,9 +14,11 @@ RUN apk add --no-cache \
     unzip \
     supervisor \
     libxml2-dev \
+    ca-certificates \
+    openssl \
     icu-dev
 
-RUN docker-php-ext-install pdo pdo_mysql intl opcache bcmath
+RUN docker-php-ext-install curl pdo pdo_mysql intl opcache bcmath
 
 WORKDIR /var/www/html
 
