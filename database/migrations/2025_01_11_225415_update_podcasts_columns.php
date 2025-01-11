@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('podcasts', function (Blueprint $table) {
             $table->text('description')->change();
-            $table->text('image_url')->change();
         });
     }
 
@@ -24,7 +23,6 @@ return new class extends Migration
     {
         Schema::table('podcasts', function (Blueprint $table) {
             $table->string('description')->change();
-            $table->string('image_url')->change();
         });
     }
 };
