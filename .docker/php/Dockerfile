@@ -14,6 +14,9 @@ RUN apk add --no-cache \
     unzip \
     supervisor \
     libxml2-dev \
+    libcurl \
+    curl-dev \
+    pkgconfig \
     ca-certificates \
     openssl \
     icu-dev
