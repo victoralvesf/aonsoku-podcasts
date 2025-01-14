@@ -1,0 +1,9 @@
+.env
+.env.production
+.git
+.vscode
+
+vendor
+storage
+tests
+reports
