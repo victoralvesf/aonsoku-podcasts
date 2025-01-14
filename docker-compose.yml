@@ -12,13 +12,7 @@ services:
                 condition: service_healthy
         env_file:
             - .env.production
-        command: |
-            bash -c "
-                php artisan migrate --force &&
-                php artisan config:cache &&
-                php artisan route:cache &&
-                php-fpm
-            "
+        command: [ "sh", "./aonsoku.sh", "start" ]
 
     nginx:
         image: nginx:alpine
@@ -54,7 +48,7 @@ services:
             - .env.production
         depends_on:
             - app
-        command: php artisan queue:work
+        command: [ "sh", "./aonsoku.sh", "queue" ]
 
     scheduler:
         build:
@@ -66,7 +60,7 @@ services:
             - .env.production
         depends_on:
             - app
-        command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+        command: [ "sh", "./aonsoku.sh", "scheduler", "1800" ] # Runs every 30 minutes
 
 volumes:
     mysql_data:
