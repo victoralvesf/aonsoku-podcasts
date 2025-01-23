@@ -58,7 +58,7 @@ services:
             - .env.production
         depends_on:
             - app
-        command: [ "sh", "./aonsoku.sh", "scheduler", "1800" ] # Runs every 30 minutes
+        command: [ "sh", "./aonsoku.sh", "scheduler", "60" ] # Runs every minute
 
 volumes:
     mysql_data:
