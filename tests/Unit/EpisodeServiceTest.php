@@ -259,9 +259,10 @@ class EpisodeServiceTest extends TestCase
     public function itShouldThrowErrorGettingANonExistentEpisode()
     {
         $user = User::factory()->create();
+        $randomId = fake()->uuid();
 
         $this->expectException(NotFoundHttpException::class);
 
-        $result = $this->episodeService->getEpisode($user, '0194aa11-b51c-79ea-8826-b2278d0c67cc');
+        $result = $this->episodeService->getEpisode($user, $randomId);
     }
 }
