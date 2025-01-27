@@ -23,6 +23,8 @@ class GetAllFilterRequest extends FormRequest
     {
         return [
             'per_page' => 'nullable|integer|min:10|max:100',
+            'order_by' => 'nullable|in:title,episode_count',
+            'sort' => 'nullable|in:asc,desc',
         ];
     }
 }
