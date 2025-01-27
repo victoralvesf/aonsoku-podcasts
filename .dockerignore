@@ -1,4 +1,5 @@
 .env
+.env.example
 .env.production
 .git
 .vscode
@@ -7,3 +8,4 @@ vendor
 storage
 tests
 reports
+bootstrap/cache/*.php
