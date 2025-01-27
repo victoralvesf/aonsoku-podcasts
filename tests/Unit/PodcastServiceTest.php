@@ -34,14 +34,102 @@ class PodcastServiceTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $podcast1 = Podcast::factory()->create(['is_visible' => true]);
+        $podcast1 = Podcast::factory()->create([
+            'title' => 'AB Podcast',
+            'is_visible' => true
+        ]);
         Podcast::factory()->create(['is_visible' => true]);
-        $podcast3 = Podcast::factory()->create(['is_visible' => true]);
+        $podcast3 = Podcast::factory()->create([
+            'title' => 'BC Podcast',
+            'is_visible' => true
+        ]);
 
         $user->podcasts()->attach($podcast1);
         $user->podcasts()->attach($podcast3);
 
         $podcasts = $this->podcastService->getPodcasts($user, []);
+
+        $this->assertCount(2, $podcasts->items());
+        $this->assertEquals($podcast1->id, $podcasts->items()[0]->id);
+        $this->assertEquals($podcast3->id, $podcasts->items()[1]->id);
+    }
+
+    #[Test]
+    public function itShouldReturnAllFollowedPodcastsSortingByDesc()
+    {
+        $user = User::factory()->create();
+
+        $podcast1 = Podcast::factory()->create([
+            'title' => 'AB Podcast',
+            'is_visible' => true
+        ]);
+        Podcast::factory()->create(['is_visible' => true]);
+        $podcast3 = Podcast::factory()->create([
+            'title' => 'BC Podcast',
+            'is_visible' => true
+        ]);
+
+        $user->podcasts()->attach($podcast1);
+        $user->podcasts()->attach($podcast3);
+
+        $podcasts = $this->podcastService->getPodcasts($user, [
+            'sort' => 'desc'
+        ]);
+
+        $this->assertCount(2, $podcasts->items());
+        $this->assertEquals($podcast3->id, $podcasts->items()[0]->id);
+        $this->assertEquals($podcast1->id, $podcasts->items()[1]->id);
+    }
+
+    #[Test]
+    public function itShouldReturnAllFollowedPodcastsOrderingByEpisodeCount()
+    {
+        $user = User::factory()->create();
+
+        $podcast1 = Podcast::factory()->create([
+            'episode_count' => 100,
+            'is_visible' => true
+        ]);
+        Podcast::factory()->create(['is_visible' => true]);
+        $podcast3 = Podcast::factory()->create([
+            'episode_count' => 90,
+            'is_visible' => true
+        ]);
+
+        $user->podcasts()->attach($podcast1);
+        $user->podcasts()->attach($podcast3);
+
+        $podcasts = $this->podcastService->getPodcasts($user, [
+            'order_by' => 'episode_count'
+        ]);
+
+        $this->assertCount(2, $podcasts->items());
+        $this->assertEquals($podcast3->id, $podcasts->items()[0]->id);
+        $this->assertEquals($podcast1->id, $podcasts->items()[1]->id);
+    }
+
+    #[Test]
+    public function itShouldReturnAllFollowedPodcastsOrderingByEpisodeCountAndSortDesc()
+    {
+        $user = User::factory()->create();
+
+        $podcast1 = Podcast::factory()->create([
+            'episode_count' => 100,
+            'is_visible' => true
+        ]);
+        Podcast::factory()->create(['is_visible' => true]);
+        $podcast3 = Podcast::factory()->create([
+            'episode_count' => 90,
+            'is_visible' => true
+        ]);
+
+        $user->podcasts()->attach($podcast1);
+        $user->podcasts()->attach($podcast3);
+
+        $podcasts = $this->podcastService->getPodcasts($user, [
+            'order_by' => 'episode_count',
+            'sort' => 'desc'
+        ]);
 
         $this->assertCount(2, $podcasts->items());
         $this->assertEquals($podcast1->id, $podcasts->items()[0]->id);

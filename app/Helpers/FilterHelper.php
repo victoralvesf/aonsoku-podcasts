@@ -2,6 +2,12 @@
 
 namespace App\Helpers;
 
+enum FilterType: string
+{
+    case Episode = 'episode';
+    case Podcast = 'podcast';
+}
+
 class FilterHelper
 {
     protected $defaults = [
@@ -11,10 +17,19 @@ class FilterHelper
         'filter_by' => 'both',
     ];
 
+    protected $podcast = [
+        'sort' => 'asc',
+        'order_by' => 'title',
+    ];
+
     protected $filters;
 
-    public function __construct(array $filters)
+    public function __construct(array $filters, FilterType $type = FilterType::Episode)
     {
+        if ($type == FilterType::Podcast) {
+            $this->defaults = array_merge($this->defaults, $this->podcast);
+        }
+
         $this->filters = array_merge($this->defaults, $filters);
     }
 

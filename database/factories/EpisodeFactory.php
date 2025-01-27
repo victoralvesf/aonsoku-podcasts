@@ -24,7 +24,7 @@ class EpisodeFactory extends Factory
             'podcast_id' => Podcast::factory(),
             'title' => fake()->sentence(),
             'description' => fake()->text(200),
-            'audio_url' => fake()->url(),
+            'audio_url' => fake()->url() . '/' . fake()->slug(4),
             'image_url' => fake()->imageUrl(600, 600, 'podcast'),
             'duration' => fake()->numberBetween(1000, 13600),
             'published_at' => fake()->dateTimeBetween('-1 year', 'now'),
