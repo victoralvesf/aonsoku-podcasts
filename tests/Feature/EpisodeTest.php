@@ -304,4 +304,60 @@ class EpisodeTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    #[Test]
+    public function itShouldGetEpisodeFromFollowedPodcast()
+    {
+        $podcast = Podcast::factory()->create(['is_visible' => true]);
+        $this->user->podcasts()->attach($podcast);
+
+        $episode = Episode::factory()->create([
+            'podcast_id' => $podcast->id,
+            'title' => '#35 - Test Episode',
+            'description' => 'Test Description',
+            'audio_url' => 'https://fakecast.com/ep35.mp3',
+            'image_url' => 'https://fakecast.com/ep35-thumbnail.jpg',
+        ]);
+
+        $url = route('episodes.show', ['id' => $episode->id]);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertOk()
+            ->assertJsonFragment([
+                'id' => $episode->id,
+                'title' => $episode->title,
+                'description' => $episode->description,
+                'audio_url' => $episode->audio_url,
+                'image_url' => $episode->image_url,
+            ]);
+    }
+
+    #[Test]
+    public function itShouldGetNotFoundErrorForEpisodeFromUnfollowedPodcast()
+    {
+        $podcast = Podcast::factory()->create(['is_visible' => true]);
+        $episode = Episode::factory()->create([
+            'podcast_id' => $podcast->id,
+            'title' => '#35 - Test Episode',
+            'description' => 'Test Description',
+            'audio_url' => 'https://fakecast.com/ep35.mp3',
+            'image_url' => 'https://fakecast.com/ep35-thumbnail.jpg',
+        ]);
+
+        $url = route('episodes.show', ['id' => $episode->id]);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertStatus(404);
+    }
+
+    #[Test]
+    public function itShouldGetNotFoundErrorForANonExistentEpisode()
+    {
+        $randomId = fake()->uuid();
+
+        $url = route('episodes.show', ['id' => $randomId]);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertStatus(404);
+    }
 }
