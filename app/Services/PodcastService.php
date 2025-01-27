@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\FilterHelper;
+use App\Helpers\FilterType;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
@@ -15,10 +16,11 @@ class PodcastService
 {
     public function getPodcasts(User $user, array $filters)
     {
-        $filters = new FilterHelper($filters);
+        $filters = new FilterHelper($filters, FilterType::Podcast);
 
         return $user->podcasts()
             ->where('is_visible', true)
+            ->orderBy($filters->getOrderBy(), $filters->getSort())
             ->simplePaginate($filters->getPerPage());
     }
 
