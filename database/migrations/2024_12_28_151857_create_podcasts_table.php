@@ -12,14 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('podcasts', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->string('author');
             $table->string('link');
             $table->string('image_url');
             $table->string('feed_url')->unique();
             $table->boolean('is_visible')->default(false);
+            $table->unsignedInteger('episode_count')->default(0);
             $table->timestamps();
         });
     }

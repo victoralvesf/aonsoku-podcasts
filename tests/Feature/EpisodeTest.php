@@ -6,6 +6,7 @@ use App\Models\Episode;
 use App\Models\Podcast;
 use App\Models\Tenant;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -16,6 +17,7 @@ class EpisodeTest extends TestCase
 
     protected array $headers;
     protected User $user;
+    protected String $randomUuid;
 
     protected function setUp(): void
     {
@@ -35,6 +37,8 @@ class EpisodeTest extends TestCase
             'username' => $username,
             'tenant_id' => $tenant->id,
         ]);
+
+        $this->randomUuid = (string) Str::uuid();
     }
 
     #[Test]
@@ -241,12 +245,12 @@ class EpisodeTest extends TestCase
             'is_visible' => true
         ]);
         $this->user->podcasts()->attach($podcast);
-        Episode::factory()->create([
+        $episode = Episode::factory()->create([
             'podcast_id' => $podcast->id,
             'duration' => 1200,
         ]);
 
-        $url = route('episodes.progress', ['id' => $podcast->id]);
+        $url = route('episodes.progress', ['id' => $episode->id]);
         $body = ['progress' => 950];
         $response = $this->patchJson($url, $body, $this->headers);
 
@@ -264,12 +268,12 @@ class EpisodeTest extends TestCase
             'is_visible' => true
         ]);
         $this->user->podcasts()->attach($podcast);
-        Episode::factory()->create([
+        $episode = Episode::factory()->create([
             'podcast_id' => $podcast->id,
             'duration' => 1200,
         ]);
 
-        $url = route('episodes.progress', ['id' => $podcast->id]);
+        $url = route('episodes.progress', ['id' => $episode->id]);
         $body = ['progress' => 1200];
         $response = $this->patchJson($url, $body, $this->headers);
 
@@ -283,7 +287,7 @@ class EpisodeTest extends TestCase
     #[Test]
     public function itShouldNotSaveEpisodeProgressIfBodyIsString()
     {
-        $url = route('episodes.progress', ['id' => 1]);
+        $url = route('episodes.progress', ['id' => $this->randomUuid]);
         $body = ['progress' => 'string'];
         $response = $this->patchJson($url, $body, $this->headers);
 
@@ -294,7 +298,7 @@ class EpisodeTest extends TestCase
     #[Test]
     public function itShouldReturnErrorIfEpisodeDoesNotExist()
     {
-        $url = route('episodes.progress', ['id' => 919]);
+        $url = route('episodes.progress', ['id' => $this->randomUuid]);
         $body = ['progress' => 1200];
         $response = $this->patchJson($url, $body, $this->headers);
 
