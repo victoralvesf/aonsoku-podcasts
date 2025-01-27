@@ -25,6 +25,15 @@ class EpisodeController extends Controller
         return response()->json($episodes, 200);
     }
 
+    public function show(Request $request, string $episodeId)
+    {
+        $user = $request->user;
+
+        $episode = $this->episodeService->getEpisode($user, $episodeId);
+
+        return response()->json($episode, 200);
+    }
+
     public function latest(Request $request)
     {
         $user = $request->user;

@@ -13,4 +13,5 @@ Route::prefix('episodes')->name('episodes.')->group(function () {
     Route::get('/podcast/{id}/search', [EpisodeController::class, 'search'])->name('search');
     Route::get('/latest', [EpisodeController::class, 'latest'])->name('latest');
     Route::patch('/{id}/progress', [EpisodeController::class, 'progress'])->name('progress');
+    Route::get('/{id}', [EpisodeController::class, 'show'])->name('show');
 });

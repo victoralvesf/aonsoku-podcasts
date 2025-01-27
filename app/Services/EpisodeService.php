@@ -11,6 +11,30 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EpisodeService
 {
+    public function getEpisode(User $user, string $episodeId)
+    {
+        $episode = Episode::where('id', $episodeId)
+            ->with(['playback' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
+            ->first();
+
+        if (!$episode) {
+            throw new NotFoundHttpException("Episode #{$episodeId} not found");
+        }
+
+        $podcast = $user->podcasts()
+            ->where('podcast_id', $episode->podcast_id)
+            ->where('is_visible', true)
+            ->first();
+
+        if (!$podcast) {
+            throw new NotFoundHttpException("Episode #{$episodeId} not found");
+        }
+
+        return $episode;
+    }
+
     public function searchPodcastEpisodes(User $user, string $podcastId, array $filters)
     {
         $podcast = $user->podcasts()
