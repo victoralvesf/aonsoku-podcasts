@@ -207,4 +207,61 @@ class EpisodeServiceTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
         $this->episodeService->updateProgress($user, '23', 100);
     }
+
+    #[Test]
+    public function itShouldGetSingleEpisodeForFollowedPodcast()
+    {
+        $user = User::factory()->create();
+        $podcast = Podcast::factory()->create(['is_visible' => true]);
+        $user->podcasts()->attach($podcast);
+
+        $episode = Episode::factory()->create([
+            'podcast_id' => $podcast->id,
+            'title' => '#35 - Test Episode',
+            'description' => 'Test Description',
+            'audio_url' => 'https://fakecast.com/ep35.mp3',
+            'image_url' => 'https://fakecast.com/ep35-thumbnail.jpg',
+        ]);
+
+        $result = $this->episodeService->getEpisode($user, $episode->id);
+
+        $this->assertInstanceOf(Episode::class, $result);
+        $this->assertEquals($episode->id, $result->id);
+        $this->assertEquals($episode->title, $result->title);
+        $this->assertEquals($episode->description, $result->description);
+        $this->assertEquals($episode->audio_url, $result->audio_url);
+        $this->assertEquals($episode->image_url, $result->image_url);
+        $this->assertEquals($episode->podcast_id, $result->podcast_id);
+
+        $this->assertTrue($result->podcast->is($podcast));
+    }
+
+    #[Test]
+    public function itShouldThrowErrorGettingUnfollowedPodcastEpisode()
+    {
+        $user = User::factory()->create();
+        $podcast = Podcast::factory()->create(['is_visible' => true]);
+
+        $episode = Episode::factory()->create([
+            'podcast_id' => $podcast->id,
+            'title' => '#35 - Test Episode',
+            'description' => 'Test Description',
+            'audio_url' => 'https://fakecast.com/ep35.mp3',
+            'image_url' => 'https://fakecast.com/ep35-thumbnail.jpg',
+        ]);
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $result = $this->episodeService->getEpisode($user, $episode->id);
+    }
+
+    #[Test]
+    public function itShouldThrowErrorGettingInexistentEpisode()
+    {
+        $user = User::factory()->create();
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $result = $this->episodeService->getEpisode($user, '0194aa11-b51c-79ea-8826-b2278d0c67cc');
+    }
 }
