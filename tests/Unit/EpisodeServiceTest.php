@@ -256,7 +256,7 @@ class EpisodeServiceTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowErrorGettingInexistentEpisode()
+    public function itShouldThrowErrorGettingANonExistentEpisode()
     {
         $user = User::factory()->create();
 
