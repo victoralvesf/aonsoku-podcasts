@@ -159,6 +159,68 @@ class PodcastTest extends TestCase
     }
 
     #[Test]
+    public function itShouldAcceptOrderByParamWithTitle()
+    {
+        $queryParams = ['order_by' => 'title'];
+        $url = route('podcasts.index', $queryParams);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    public function itShouldAcceptOrderByParamWithEpisodeCount()
+    {
+        $queryParams = ['order_by' => 'episode_count'];
+        $url = route('podcasts.index', $queryParams);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    public function itShouldNotAcceptInvalidOrderByParam()
+    {
+        $queryParams = ['order_by' => 'description'];
+        $url = route('podcasts.index', $queryParams);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('order_by');
+    }
+
+    #[Test]
+    public function itShouldAcceptSortParamWithAsc()
+    {
+        $queryParams = ['sort' => 'asc'];
+        $url = route('podcasts.index', $queryParams);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    public function itShouldAcceptSortParamWithDesc()
+    {
+        $queryParams = ['sort' => 'desc'];
+        $url = route('podcasts.index', $queryParams);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    public function itShouldNotAcceptInvalidSortParam()
+    {
+        $queryParams = ['sort' => 'invalid'];
+        $url = route('podcasts.index', $queryParams);
+        $response = $this->getJson($url, $this->headers);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('sort');
+    }
+
+    #[Test]
     public function itShouldGetFollowedPodcastById()
     {
         $podcast = Podcast::factory()->create([
