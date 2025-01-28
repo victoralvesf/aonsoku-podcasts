@@ -2,7 +2,7 @@
 
 # Check if an argument was provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 {start|queue|scheduler [interval_in_seconds]}"
+    echo "Usage: $0 {start|queue|scheduler}"
     exit 1
 fi
 
@@ -22,16 +22,13 @@ case "$1" in
         ;;
 
     scheduler)
-        INTERVAL=${2:-60}
-        echo "Starting the scheduler with an interval of $INTERVAL seconds..."
-        while true; do
-            php artisan schedule:run --verbose --no-interaction
-            sleep $INTERVAL
-        done
+        echo "Starting the scheduler..."
+        crond -f &
+        tail -f /var/log/schedule.log
         ;;
 
     *)
-        echo "Invalid command! Usage: $0 {start|queue|scheduler [interval_in_seconds]}"
+        echo "Invalid command! Usage: $0 {start|queue|scheduler}"
         exit 1
         ;;
 esac

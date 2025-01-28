@@ -1,0 +1,1 @@
+0 */2 * * * cd /var/www/html && php artisan schedule:run --verbose --no-interaction >> /var/log/schedule.log 2>&1

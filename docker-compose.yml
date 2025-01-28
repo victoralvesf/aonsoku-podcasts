@@ -3,6 +3,7 @@ services:
         build:
             context: .
             dockerfile: .docker/php/Dockerfile
+        image: aonsoku_podcasts
         container_name: aonsoku_podcasts
         working_dir: /var/www/html
         depends_on:
@@ -40,6 +41,7 @@ services:
         build:
             context: .
             dockerfile: .docker/php/Dockerfile
+        image: aonsoku_podcasts
         container_name: aonsoku_podcasts_queue
         working_dir: /var/www/html
         env_file:
@@ -52,13 +54,14 @@ services:
         build:
             context: .
             dockerfile: .docker/php/Dockerfile
+        image: aonsoku_podcasts
         container_name: aonsoku_podcasts_scheduler
         working_dir: /var/www/html
         env_file:
             - .env.production
         depends_on:
             - app
-        command: [ "sh", "./aonsoku.sh", "scheduler", "60" ] # Runs every minute
+        command: [ "sh", "./aonsoku.sh", "scheduler" ]
 
 volumes:
     mysql_data:
