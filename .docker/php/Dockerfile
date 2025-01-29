@@ -20,6 +20,7 @@ RUN apk add --no-cache \
     ca-certificates \
     openssl \
     icu-dev \
+    alpine-conf \
     dcron
 
 RUN docker-php-ext-install curl pdo pdo_mysql intl opcache bcmath
