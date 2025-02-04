@@ -13,7 +13,7 @@ class PodcastItemHelper
         return [
             'podcast_id' => $podcast->id,
             'title' => $item->get_title(),
-            'description' => $item->get_description() ?? '',
+            'description' => $item->get_content() ?? '',
             'audio_url' => $item->get_enclosure()->get_link(),
             'image_url' => self::getItunesImage($item, $podcast->image_url),
             'duration' => self::getItunesDuration($item),
