@@ -17,6 +17,7 @@ class EpisodeService
             ->with(['playback' => function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             }])
+            ->with('podcast')
             ->first();
 
         if (!$episode) {
