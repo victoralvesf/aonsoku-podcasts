@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignUuid('podcast_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
-            $table->string('audio_url');
-            $table->string('image_url');
+            $table->string('audio_url', 2048);
+            $table->string('image_url', 2048);
             $table->unsignedInteger('duration');
             $table->dateTime('published_at');
             $table->timestamps();
