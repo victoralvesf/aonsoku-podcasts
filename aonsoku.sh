@@ -34,6 +34,7 @@ case "$1" in
 
     queue)
         set_timezone
+        sleep 5
         echo "Starting the queue worker..."
         php artisan queue:work
         echo "Queue worker started successfully."
