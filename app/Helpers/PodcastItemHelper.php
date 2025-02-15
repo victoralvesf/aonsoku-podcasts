@@ -13,13 +13,23 @@ class PodcastItemHelper
     {
         return [
             'podcast_id' => $podcast->id,
-            'title' => $item->get_title(),
+            'title' => self::formatTitle($item->get_title()),
             'description' => $item->get_content() ?? '',
             'audio_url' => self::getAudioUrl($item),
             'image_url' => self::getItunesImage($item, $podcast->image_url),
             'duration' => self::getItunesDuration($item),
             'published_at' => self::getPublishDate($item),
         ];
+    }
+
+    public static function formatTitle(string $title)
+    {
+        $formatted_title = html_entity_decode($title);
+        $formatted_title = str_replace(["\n", "\r"], ' ', $formatted_title);
+        $formatted_title = preg_replace('/\s+/', ' ', $formatted_title);
+        $formatted_title = trim($formatted_title);
+
+        return $formatted_title;
     }
 
     public static function getAudioUrl(SimplePieItem $item)
