@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->string('author');
-            $table->string('link');
-            $table->string('image_url');
-            $table->string('feed_url')->unique();
+            $table->string('link', 1024);
+            $table->string('image_url', 2048);
+            $table->string('feed_url', 1024)->unique();
             $table->boolean('is_visible')->default(false);
             $table->unsignedInteger('episode_count')->default(0);
             $table->timestamps();
