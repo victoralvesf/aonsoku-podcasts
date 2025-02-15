@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Podcast;
+use RuntimeException;
 use SimplePie\Item as SimplePieItem;
 use SimplePie\SimplePie;
 
@@ -14,11 +15,29 @@ class PodcastItemHelper
             'podcast_id' => $podcast->id,
             'title' => $item->get_title(),
             'description' => $item->get_content() ?? '',
-            'audio_url' => $item->get_enclosure()->get_link(),
+            'audio_url' => self::getAudioUrl($item),
             'image_url' => self::getItunesImage($item, $podcast->image_url),
             'duration' => self::getItunesDuration($item),
             'published_at' => self::getPublishDate($item),
         ];
+    }
+
+    public static function getAudioUrl(SimplePieItem $item)
+    {
+        $audio_url = null;
+
+        foreach ($item->get_enclosures() as $enclosure) {
+            if (strpos($enclosure->get_type(), 'audio/') === 0) {
+                $audio_url = $enclosure->get_link();
+                break;
+            }
+        }
+
+        if (!$audio_url) {
+            throw new RuntimeException('No audio_url found for the episode.');
+        }
+
+        return $audio_url;
     }
 
     public static function getItunesImage(SimplePieItem $item, string $defaultImage)
