@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\FilterHelper;
 use App\Helpers\FilterType;
+use App\Helpers\PodcastItemHelper;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
@@ -73,7 +74,9 @@ class PodcastService
             $feed = FeedsFacade::make($feedUrl);
 
             $title = $feed->get_title();
+            $title = PodcastItemHelper::formatTitle($title);
             $description = $feed->get_description() ?? '';
+            $description = PodcastItemHelper::formatTitle($description);
             $author = $feed->get_author()->name ?? '';
             $link = $feed->get_link() ?? '';
             $image_url = $feed->get_image_url();
