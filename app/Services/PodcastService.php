@@ -9,6 +9,7 @@ use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use willvincent\Feeds\Facades\FeedsFacade;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -72,6 +73,10 @@ class PodcastService
 
         try {
             $feed = FeedsFacade::make($feedUrl);
+
+            if ($feed->error !== null) {
+                throw new RuntimeException($feed->error);
+            }
 
             $title = $feed->get_title();
             $title = PodcastItemHelper::formatTitle($title);
