@@ -23,21 +23,21 @@ fi
 case "$1" in
     start)
         set_timezone
-        echo "Running migrations and caching configurations..."
+        echo "Running migrations..."
         php artisan migrate --force
+        echo "Caching config..."
         php artisan config:cache
+        echo "Caching routes..."
         php artisan route:cache
         echo "Starting php-fpm"
         php-fpm
-        echo "Service started successfully."
         ;;
 
     queue)
         set_timezone
-        sleep 5
+        sleep 10
         echo "Starting the queue worker..."
-        php artisan queue:work
-        echo "Queue worker started successfully."
+        exec /usr/bin/supervisord -c /etc/supervisord.conf
         ;;
 
     scheduler)
@@ -45,7 +45,6 @@ case "$1" in
         echo "Starting the scheduler..."
         crond -f &
         tail -f /var/log/schedule.log
-        echo "Scheduler started successfully."
         ;;
 
     *)

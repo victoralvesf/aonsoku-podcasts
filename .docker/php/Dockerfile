@@ -36,9 +36,12 @@ RUN mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/logs &&
 
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
+# Queue Worker
+COPY ./.docker/supervisord.conf /etc/supervisord.conf
+
 # Scheduler Crontab
 RUN mkdir -p /var/spool/cron/crontabs
-COPY schedule-crontab /var/spool/cron/crontabs/root
+COPY ./.docker/schedule-crontab /var/spool/cron/crontabs/root
 RUN chmod 0600 /var/spool/cron/crontabs/root \
     && touch /var/log/schedule.log \
     && chmod 0644 /var/log/schedule.log
