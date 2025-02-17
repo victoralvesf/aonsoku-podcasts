@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\FilterHelper;
 use App\Helpers\FilterType;
 use App\Helpers\PodcastItemHelper;
+use App\Jobs\ProcessPodcast;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
@@ -57,9 +58,9 @@ class PodcastService
         ];
     }
 
-    public function storePodcast(User $user, string $feedUrl)
+    public function storePodcast(User $user, string $feed_url)
     {
-        $podcast = Podcast::where('feed_url', $feedUrl)->first();
+        $podcast = Podcast::where('feed_url', $feed_url)->first();
 
         if ($podcast) {
             $userFollowsThePodcast = $user->podcasts()->where('podcast_id', $podcast->id)->exists();
@@ -72,28 +73,15 @@ class PodcastService
         }
 
         try {
-            $feed = FeedsFacade::make($feedUrl);
+            $feed = FeedsFacade::make($feed_url);
 
             if ($feed->error !== null) {
                 throw new RuntimeException($feed->error);
             }
 
-            $title = $feed->get_title();
-            $title = PodcastItemHelper::formatTitle($title);
-            $description = $feed->get_description() ?? '';
-            $description = PodcastItemHelper::formatTitle($description);
-            $author = $feed->get_author()->name ?? '';
-            $link = $feed->get_link() ?? '';
-            $image_url = $feed->get_image_url();
+            $formatted_podcast = PodcastItemHelper::formatPodcast($feed, $feed_url);
 
-            $podcast = Podcast::create([
-                'title' => $title,
-                'description' => $description,
-                'author' => $author,
-                'link' => $link,
-                'image_url' => $image_url,
-                'feed_url' => $feedUrl,
-            ]);
+            $podcast = Podcast::create($formatted_podcast);
             $podcast->refresh();
 
             $user->podcasts()->attach($podcast->id);
@@ -102,11 +90,20 @@ class PodcastService
 
             return $podcast;
         } catch (\Exception $e) {
-            Log::error('Error reading the feed.', [
-                'feed_url' => $feedUrl,
+            Log::error('[PodcastService] - Error reading the feed.', [
+                'feed_url' => $feed_url,
                 'message' => $e->getMessage(),
             ]);
             throw new UnprocessableEntityHttpException('Error reading the feed. Please check the URL and try again.');
+        }
+    }
+
+    public function storePodcastInBackground(User $user, string $feed_url)
+    {
+        $podcast = Podcast::where('feed_url', $feed_url)->first();
+
+        if (!$podcast) {
+            ProcessPodcast::dispatch($user, $feed_url);
         }
     }
 

@@ -53,11 +53,13 @@ class PodcastController extends Controller
         }
 
         if (!empty($validated['feed_urls'])) {
-            $podcasts = [];
             foreach ($validated['feed_urls'] as $feedUrl) {
-                $podcasts[] = $this->podcastService->storePodcast($user, $feedUrl);
+                $this->podcastService->storePodcastInBackground($user, $feedUrl);
             }
-            return response()->json($podcasts, 201);
+            $response = [
+                'message' => 'Processing started. They will be available in just a few minutes!'
+            ];
+            return response()->json($response, 202);
         }
     }
 
