@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\UpdatePodcastEpisodes;
+use App\Jobs\TriggerPodcastsUpdate;
 use Illuminate\Console\Command;
 
 class UpdatePodcasts extends Command
@@ -26,7 +26,7 @@ class UpdatePodcasts extends Command
      */
     public function handle()
     {
-        UpdatePodcastEpisodes::dispatch();
-        $this->info('Update Episodes job dispatched');
+        TriggerPodcastsUpdate::dispatch();
+        $this->info('Trigger to Update Episodes dispatched');
     }
 }

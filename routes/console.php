@@ -1,6 +1,6 @@
 <?php
 
-use App\Jobs\UpdatePodcastEpisodes;
+use App\Jobs\TriggerPodcastsUpdate;
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::job(new UpdatePodcastEpisodes)->everyTwoHours();
+Schedule::job(new TriggerPodcastsUpdate)->everyTwoHours();

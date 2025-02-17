@@ -15,12 +15,16 @@ class UpdatePodcastEpisodes implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
+    protected $podcast;
+
     /**
      * Create a new job instance.
+     *
+     * @param Podcast $podcast
      */
-    public function __construct()
+    public function __construct(Podcast $podcast)
     {
-        //
+        $this->podcast = $podcast;
     }
 
     /**
@@ -28,52 +32,48 @@ class UpdatePodcastEpisodes implements ShouldQueue
      */
     public function handle(): void
     {
-        $podcasts = Podcast::cursor();
+        try {
+            $feed = FeedsFacade::make($this->podcast->feed_url);
+            $items = $feed->get_items();
+            $consecutiveExistingCount = 0;
 
-        foreach ($podcasts as $podcast) {
-            try {
-                $feed = FeedsFacade::make($podcast->feed_url);
-                $items = $feed->get_items();
-                $consecutiveExistingCount = 0;
+            foreach ($items as $item) {
+                try {
+                    $publishedAt = PodcastItemHelper::getPublishDate($item);
 
-                foreach ($items as $item) {
-                    try {
-                        $publishedAt = PodcastItemHelper::getPublishDate($item);
+                    $episodeExists = Episode::where('podcast_id', $this->podcast->id)
+                        ->where('published_at', $publishedAt)
+                        ->exists();
 
-                        $episodeExists = Episode::where('podcast_id', $podcast->id)
-                            ->where('published_at', $publishedAt)
-                            ->exists();
+                    if ($episodeExists) {
+                        $consecutiveExistingCount++;
 
-                        if ($episodeExists) {
-                            $consecutiveExistingCount++;
-
-                            // Stops foreach if find at least 3 existing episodes.
-                            if ($consecutiveExistingCount >= 3) {
-                                break;
-                            }
-
-                            continue;
+                        // Stops foreach if find at least 3 existing episodes.
+                        if ($consecutiveExistingCount >= 3) {
+                            break;
                         }
 
-                        $consecutiveExistingCount = 0;
-
-                        $episode = PodcastItemHelper::formatEpisode($item, $podcast);
-                        Episode::create($episode);
-                    } catch (\Exception $e) {
-                        Log::error("[UpdatePodcastEpisodes] - Error processing episode:", [
-                            'podcast' => $podcast->title,
-                            'episode' => $item->get_title(),
-                            'error' => $e->getMessage(),
-                        ]);
+                        continue;
                     }
+
+                    $consecutiveExistingCount = 0;
+
+                    $episode = PodcastItemHelper::formatEpisode($item, $this->podcast);
+                    Episode::create($episode);
+                } catch (\Exception $e) {
+                    Log::error("[UpdatePodcastEpisodes] - Error processing episode:", [
+                        'podcast' => $this->podcast->title,
+                        'episode' => $item->get_title(),
+                        'error' => $e->getMessage(),
+                    ]);
                 }
-            } catch (\Exception $e) {
-                Log::error("[UpdatePodcastEpisodes] - Error updating episodes for podcast:", [
-                    'id' => $podcast->id,
-                    'title' => $podcast->title,
-                    'error' => $e->getMessage(),
-                ]);
             }
+        } catch (\Exception $e) {
+            Log::error("[UpdatePodcastEpisodes] - Error updating episodes for podcast:", [
+                'id' => $this->podcast->id,
+                'title' => $this->podcast->title,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }
