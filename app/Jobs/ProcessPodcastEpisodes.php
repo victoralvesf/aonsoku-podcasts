@@ -41,7 +41,8 @@ class ProcessPodcastEpisodes implements ShouldQueue
 
             foreach ($reversedItems as $item) {
                 try {
-                    $audioUrlExists = Episode::where('audio_url', $item->get_permalink())->exists();
+                    $item_audio_url = PodcastItemHelper::getAudioUrl($item);
+                    $audioUrlExists = Episode::where('audio_url', $item_audio_url)->exists();
 
                     if ($audioUrlExists) {
                         continue;
