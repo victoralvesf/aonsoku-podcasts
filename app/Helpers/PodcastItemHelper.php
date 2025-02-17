@@ -112,4 +112,22 @@ class PodcastItemHelper
 
         return 0; // Return 0 if format is unrecognized
     }
+
+    public static function formatPodcast(SimplePie $feed, string $feed_url)
+    {
+        $title = self::formatTitle($feed->get_title());
+        $description = self::formatTitle($feed->get_description() ?? '');
+        $author = $feed->get_author()->name ?? '';
+        $link = $feed->get_link() ?? '';
+        $image_url = $feed->get_image_url();
+
+        return [
+            'title' => $title,
+            'description' => $description,
+            'author' => $author,
+            'link' => $link,
+            'image_url' => $image_url,
+            'feed_url' => $feed_url,
+        ];
+    }
 }
