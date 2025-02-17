@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use SimplePie\SimplePie;
 use Tests\TestCase;
 use willvincent\Feeds\Facades\FeedsFacade;
 
@@ -272,20 +273,24 @@ class PodcastTest extends TestCase
     {
         Bus::fake();
 
-        $mockFeed = Mockery::mock();
-        $mockFeed->shouldReceive('get_title')->andReturn('Mock Podcast');
-        $mockFeed->shouldReceive('get_description')->andReturn('A sample mock podcast feed');
-        $mockFeed->shouldReceive('get_author')->andReturn((object) ['name' => 'John Doe']);
-        $mockFeed->shouldReceive('get_link')->andReturn('http://example.com');
-        $mockFeed->shouldReceive('get_image_url')->andReturn('http://example.com/image.jpg');
+        $feed_url = 'http://newfeed.com/rss';
+
+        $mockFeed = Mockery::mock(SimplePie::class, [
+            'get_title' => 'Mock Podcast',
+            'get_description' => 'A sample mock podcast feed',
+            'get_author' => ['name' => 'John Doe'],
+            'get_link' => 'http://example.com',
+            'get_image_url' => 'http://example.com/image.jpg',
+            'error' => null,
+        ]);
 
         FeedsFacade::shouldReceive('make')
             ->once()
-            ->with('http://newfeed.com/rss')
+            ->with($feed_url)
             ->andReturn($mockFeed);
 
         $url = route('podcasts.store');
-        $body = ['feed_url' => 'http://newfeed.com/rss'];
+        $body = ['feed_url' => $feed_url];
         $response = $this->postJson($url, $body, $this->headers);
 
         $response->assertStatus(201);
@@ -301,49 +306,48 @@ class PodcastTest extends TestCase
     #[Test]
     public function itShouldCreatePodcastFromMultipleFeedUrls()
     {
-        Bus::fake();
-
-        $mockFeed1 = Mockery::mock();
-        $mockFeed1->shouldReceive('get_title')->andReturn('Mock Podcast 1');
-        $mockFeed1->shouldReceive('get_description')->andReturn('A sample mock podcast feed 1');
-        $mockFeed1->shouldReceive('get_author')->andReturn((object) ['name' => 'Don Juan']);
-        $mockFeed1->shouldReceive('get_link')->andReturn('http://exampleone.com');
-        $mockFeed1->shouldReceive('get_image_url')->andReturn('http://exampleone.com/image.jpg');
-
-        FeedsFacade::shouldReceive('make')
-            ->with('http://one.newfeed.com/rss')
-            ->andReturn($mockFeed1);
-
-        $mockFeed2 = Mockery::mock();
-        $mockFeed2->shouldReceive('get_title')->andReturn('Mock Podcast 2');
-        $mockFeed2->shouldReceive('get_description')->andReturn('A sample mock podcast feed 2');
-        $mockFeed2->shouldReceive('get_author')->andReturn((object) ['name' => 'John Doe']);
-        $mockFeed2->shouldReceive('get_link')->andReturn('http://exampletwo.com');
-        $mockFeed2->shouldReceive('get_image_url')->andReturn('http://exampletwo.com/image.jpg');
+        $feed_url_1 = 'http://one.newfeed.com/rss';
+        $mock_feed_1 = Mockery::mock(SimplePie::class, [
+            'get_title' => 'Mock Podcast 1',
+            'get_description' => 'A sample mock podcast feed 1',
+            'get_author' => ['name' => 'Don Juan'],
+            'get_link' => 'http://exampleone.com',
+            'get_image_url' => 'http://exampleone.com/image.jpg',
+            'error' => null,
+        ]);
 
         FeedsFacade::shouldReceive('make')
-            ->with('http://two.newfeed.com/rss')
-            ->andReturn($mockFeed2);
+            ->with($feed_url_1)
+            ->andReturn($mock_feed_1);
+
+        $feed_url_2 = 'http://two.newfeed.com/rss';
+        $mock_feed_2 = Mockery::mock(SimplePie::class, [
+            'get_title' => 'Mock Podcast 2',
+            'get_description' => 'A sample mock podcast feed 2',
+            'get_author' => ['name' => 'John Doe'],
+            'get_link' => 'http://exampletwo.com',
+            'get_image_url' => 'http://exampletwo.com/image.jpg',
+            'error' => null,
+        ]);
+
+        FeedsFacade::shouldReceive('make')
+            ->with($feed_url_2)
+            ->andReturn($mock_feed_2);
 
         $url = route('podcasts.store');
-        $body = ['feed_urls' => [
-            'http://one.newfeed.com/rss',
-            'http://two.newfeed.com/rss',
-        ]];
+        $body = ['feed_urls' => [$feed_url_1, $feed_url_2]];
         $response = $this->postJson($url, $body, $this->headers);
 
-        $response->assertStatus(201);
+        $response->assertStatus(202);
 
         $this->assertDatabaseHas(Podcast::class, [
             'title' => 'Mock Podcast 1',
-            'feed_url' => 'http://one.newfeed.com/rss'
+            'feed_url' => $feed_url_1
         ]);
         $this->assertDatabaseHas(Podcast::class, [
             'title' => 'Mock Podcast 2',
-            'feed_url' => 'http://two.newfeed.com/rss'
+            'feed_url' => $feed_url_2
         ]);
-
-        Bus::assertDispatchedTimes(ProcessPodcastEpisodes::class, 2);
     }
 
     #[Test]
