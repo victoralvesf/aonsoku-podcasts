@@ -36,6 +36,9 @@ RUN mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/logs &&
 
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
+# Update php memory limit
+COPY ./.docker/php/memory-limit.ini /usr/local/etc/php/conf.d/
+
 # Queue Worker
 COPY ./.docker/supervisord.conf /etc/supervisord.conf
 
