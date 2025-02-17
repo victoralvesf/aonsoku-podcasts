@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use SimplePie\Item as SimplePieItem;
+use SimplePie\Enclosure as SimplePieEnclosure;
+use SimplePie\SimplePie;
 use Tests\TestCase;
 use willvincent\Feeds\Facades\FeedsFacade;
 
@@ -24,28 +26,30 @@ class ProcessPodcastEpisodesTest extends TestCase
             'feed_url' => 'http://fakefeed.com/rss'
         ]);
 
-        $feedMock = Mockery::mock();
+        $enclosure1 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure1->shouldReceive('get_type')->andReturn('audio/mpeg');
+        $enclosure1->shouldReceive('get_link')->andReturn('https://example.com/episode1.mp3');
+
+        $enclosure2 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure2->shouldReceive('get_type')->andReturn('audio/mpeg');
+        $enclosure2->shouldReceive('get_link')->andReturn('https://example.com/episode2.mp3');
+
+        $feedMock = Mockery::mock(SimplePie::class);
         $feedMock->shouldReceive('get_items')->andReturn([
-            Mockery::mock(SimplePieItem::class, [
-                'get_title' => 'Episode 1',
-                'get_permalink' => 'https://example.com/episode1.mp3',
-                'get_description' => 'Description for Episode 1',
-                'get_enclosure' => Mockery::mock([
-                    'get_link' => 'https://example.com/episode1.mp3'
-                ]),
-                'get_item_tags' => [],
-                'get_date' => fake()->dateTime()->format('Y-m-d H:i:s'),
-            ]),
-            Mockery::mock(SimplePieItem::class, [
-                'get_title' => 'Episode 2',
-                'get_permalink' => 'https://example.com/episode2.mp3',
-                'get_description' => 'Description for Episode 2',
-                'get_enclosure' => Mockery::mock([
-                    'get_link' => 'https://example.com/episode2.mp3'
-                ]),
-                'get_item_tags' => [],
-                'get_date' => fake()->dateTime()->format('Y-m-d H:i:s'),
-            ]),
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure1) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 1');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 1');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure1]);
+                $mock->shouldReceive('get_item_tags')->andReturn([]);
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure2) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 2');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 2');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure2]);
+                $mock->shouldReceive('get_item_tags')->andReturn([]);
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
         ]);
 
         FeedsFacade::shouldReceive('make')
@@ -70,28 +74,30 @@ class ProcessPodcastEpisodesTest extends TestCase
             'audio_url' => 'https://example.com/episode1.mp3'
         ]);
 
-        $feedMock = Mockery::mock();
+        $enclosure1 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure1->shouldReceive('get_type')->andReturn('audio/mpeg');
+        $enclosure1->shouldReceive('get_link')->andReturn('https://example.com/episode1.mp3');
+
+        $enclosure2 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure2->shouldReceive('get_type')->andReturn('audio/mpeg');
+        $enclosure2->shouldReceive('get_link')->andReturn('https://example.com/episode2.mp3');
+
+        $feedMock = Mockery::mock(SimplePie::class);
         $feedMock->shouldReceive('get_items')->andReturn([
-            Mockery::mock(SimplePieItem::class, [
-                'get_title' => 'Episode 1',
-                'get_permalink' => 'https://example.com/episode1.mp3',
-                'get_description' => 'Description for Episode 1',
-                'get_enclosure' => Mockery::mock([
-                    'get_link' => 'https://example.com/episode1.mp3'
-                ]),
-                'get_item_tags' => [],
-                'get_date' => fake()->dateTime()->format('Y-m-d H:i:s'),
-            ]),
-            Mockery::mock(SimplePieItem::class, [
-                'get_title' => 'Episode 2',
-                'get_permalink' => 'https://example.com/episode2.mp3',
-                'get_description' => 'Description for Episode 2',
-                'get_enclosure' => Mockery::mock([
-                    'get_link' => 'https://example.com/episode2.mp3'
-                ]),
-                'get_item_tags' => [],
-                'get_date' => fake()->dateTime()->format('Y-m-d H:i:s'),
-            ]),
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure1) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 1');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 1');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure1]);
+                $mock->shouldReceive('get_item_tags')->andReturn([]);
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure2) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 2');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 2');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure2]);
+                $mock->shouldReceive('get_item_tags')->andReturn([]);
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
         ]);
 
         FeedsFacade::shouldReceive('make')
@@ -107,6 +113,50 @@ class ProcessPodcastEpisodesTest extends TestCase
             'podcast_id' => $podcast->id,
             'audio_url' => 'https://example.com/episode1.mp3'
         ]);
+        $this->assertTrue($podcast->fresh()->is_visible);
+    }
+
+    #[Test]
+    public function itShouldNotProcessPodcastEpisodesIfTheyDoNotHaveAudioUrl()
+    {
+        $podcast = Podcast::factory()->create([
+            'feed_url' => 'http://fakefeed.com/rss'
+        ]);
+
+        $enclosure1 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure1->shouldReceive('get_type')->andReturn('image/png');
+        $enclosure1->shouldReceive('get_link')->andReturn('https://example.com/cover1.png');
+
+        $enclosure2 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure2->shouldReceive('get_type')->andReturn('image/png');
+        $enclosure2->shouldReceive('get_link')->andReturn('https://example.com/cover2.png');
+
+        $feedMock = Mockery::mock(SimplePie::class);
+        $feedMock->shouldReceive('get_items')->andReturn([
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure1) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 1');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 1');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure1]);
+                $mock->shouldReceive('get_item_tags')->andReturn([]);
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure2) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 2');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 2');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure2]);
+                $mock->shouldReceive('get_item_tags')->andReturn([]);
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
+        ]);
+
+        FeedsFacade::shouldReceive('make')
+            ->with($podcast->feed_url)
+            ->andReturn($feedMock);
+
+        $job = new ProcessPodcastEpisodes($podcast);
+        $job->handle();
+
+        $this->assertDatabaseCount(Episode::class, 0);
         $this->assertTrue($podcast->fresh()->is_visible);
     }
 
@@ -142,28 +192,31 @@ class ProcessPodcastEpisodesTest extends TestCase
             'feed_url' => 'http://fakefeed.com/rss'
         ]);
 
-        $item1 = Mockery::mock(SimplePieItem::class);
-        $item1->shouldReceive('get_title')->andReturn('Episode 1');
-        $item1->shouldReceive('get_permalink')->andReturn('https://example.com/episode1.mp3');
-        $item1->shouldReceive('get_description')->andReturn('Description for Episode 1');
-        $item1->shouldReceive('get_enclosure')->andReturn(Mockery::mock([
-            'get_link' => 'https://example.com/episode1.mp3'
-        ]));
-        $item1->shouldReceive('get_item_tags')->andThrow(new \Exception('Simulated error'));
-        $item1->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+        $enclosure1 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure1->shouldReceive('get_type')->andReturn('audio/mpeg');
+        $enclosure1->shouldReceive('get_link')->andReturn('https://example.com/episode1.mp3');
 
-        $item2 = Mockery::mock(SimplePieItem::class);
-        $item2->shouldReceive('get_title')->andReturn('Episode 2');
-        $item2->shouldReceive('get_permalink')->andReturn('https://example.com/episode2.mp3');
-        $item2->shouldReceive('get_description')->andReturn('Description for Episode 2');
-        $item2->shouldReceive('get_enclosure')->andReturn(Mockery::mock([
-            'get_link' => 'https://example.com/episode2.mp3'
-        ]));
-        $item2->shouldReceive('get_item_tags')->andThrow(new \Exception('Simulated error'));
-        $item2->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+        $enclosure2 = Mockery::mock(SimplePieEnclosure::class);
+        $enclosure2->shouldReceive('get_type')->andReturn('audio/mpeg');
+        $enclosure2->shouldReceive('get_link')->andReturn('https://example.com/episode2.mp3');
 
-        $feedMock = Mockery::mock();
-        $feedMock->shouldReceive('get_items')->andReturn([$item1, $item2]);
+        $feedMock = Mockery::mock(SimplePie::class);
+        $feedMock->shouldReceive('get_items')->andReturn([
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure1) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 1');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 1');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure1]);
+                $mock->shouldReceive('get_item_tags')->andThrow(new \Exception('Simulated error'));
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
+            Mockery::mock(SimplePieItem::class, function ($mock) use ($enclosure2) {
+                $mock->shouldReceive('get_title')->andReturn('Episode 2');
+                $mock->shouldReceive('get_content')->andReturn('Description for Episode 2');
+                $mock->shouldReceive('get_enclosures')->andReturn([$enclosure2]);
+                $mock->shouldReceive('get_item_tags')->andThrow(new \Exception('Simulated error'));
+                $mock->shouldReceive('get_date')->andReturn(fake()->dateTime()->format('Y-m-d H:i:s'));
+            }),
+        ]);
 
         FeedsFacade::shouldReceive('make')
             ->with($podcast->feed_url)
