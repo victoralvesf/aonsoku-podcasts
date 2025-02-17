@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use SimplePie\SimplePie;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Tests\TestCase;
@@ -211,7 +212,7 @@ class PodcastServiceTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $mockFeed = Mockery::mock('SimplePie');
+        $mockFeed = Mockery::mock(SimplePie::class);
         $mockFeed->shouldReceive('get_title')->andReturn('Test Podcast');
         $mockFeed->shouldReceive('get_description')->andReturn('A sample podcast feed');
         $mockFeed->shouldReceive('get_author')->andReturn((object) ['name' => 'John Doe']);
