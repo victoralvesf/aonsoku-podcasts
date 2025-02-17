@@ -39,8 +39,9 @@ class ProcessPodcast implements ShouldQueue
         try {
             $feed = FeedsFacade::make($this->feed_url);
 
-            if ($feed->error !== null) {
-                throw new RuntimeException($feed->error);
+            $error = $feed->error();
+            if ($error !== null) {
+                throw new RuntimeException($error);
             }
 
             $formatted_podcast = PodcastItemHelper::formatPodcast($feed, $this->feed_url);

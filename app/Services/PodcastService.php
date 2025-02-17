@@ -75,8 +75,9 @@ class PodcastService
         try {
             $feed = FeedsFacade::make($feed_url);
 
-            if ($feed->error !== null) {
-                throw new RuntimeException($feed->error);
+            $error = $feed->error();
+            if ($error !== null) {
+                throw new RuntimeException($error);
             }
 
             $formatted_podcast = PodcastItemHelper::formatPodcast($feed, $feed_url);
