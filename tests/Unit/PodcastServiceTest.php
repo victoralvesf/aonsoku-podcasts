@@ -207,16 +207,17 @@ class PodcastServiceTest extends TestCase
     }
 
     #[Test]
-    public function itShouldCreatePodcastAndDispatchJobWhenFeedDoesNotExist()
+    public function itShouldCreatePodcastAndDispatchTheEpisodeProcessJob()
     {
         $user = User::factory()->create();
 
-        $mockFeed = Mockery::mock();
+        $mockFeed = Mockery::mock('SimplePie');
         $mockFeed->shouldReceive('get_title')->andReturn('Test Podcast');
         $mockFeed->shouldReceive('get_description')->andReturn('A sample podcast feed');
         $mockFeed->shouldReceive('get_author')->andReturn((object) ['name' => 'John Doe']);
         $mockFeed->shouldReceive('get_link')->andReturn('http://example.com');
         $mockFeed->shouldReceive('get_image_url')->andReturn('http://example.com/image.jpg');
+        $mockFeed->shouldReceive('error')->andReturn(null);
 
         FeedsFacade::shouldReceive('make')
             ->once()
