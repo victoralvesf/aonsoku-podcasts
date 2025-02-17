@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Jobs\ProcessPodcast;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Episode;
 use App\Models\Podcast;
@@ -10,6 +11,7 @@ use App\Services\PodcastService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use SimplePie\SimplePie;
@@ -212,30 +214,68 @@ class PodcastServiceTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $mockFeed = Mockery::mock(SimplePie::class);
-        $mockFeed->shouldReceive('get_title')->andReturn('Test Podcast');
-        $mockFeed->shouldReceive('get_description')->andReturn('A sample podcast feed');
-        $mockFeed->shouldReceive('get_author')->andReturn((object) ['name' => 'John Doe']);
-        $mockFeed->shouldReceive('get_link')->andReturn('http://example.com');
-        $mockFeed->shouldReceive('get_image_url')->andReturn('http://example.com/image.jpg');
-        $mockFeed->shouldReceive('error')->andReturn(null);
+        $mock_feed = Mockery::mock(SimplePie::class, [
+            'get_title' => 'Test Podcast',
+            'get_description' => 'A sample podcast feed',
+            'get_author' => ['name' => 'John Doe'],
+            'get_link' => 'http://example.com',
+            'get_image_url' => 'http://example.com/image.jpg',
+            'error' => null,
+        ]);
+
+        $feed_url = 'http://newfeed.com/rss';
 
         FeedsFacade::shouldReceive('make')
             ->once()
-            ->with('http://newfeed.com/rss')
-            ->andReturn($mockFeed);
+            ->with($feed_url)
+            ->andReturn($mock_feed);
 
         Bus::fake();
 
-        $podcast = $this->podcastService->storePodcast($user, 'http://newfeed.com/rss');
-        $podcastIsNowFollowed = $user->podcasts()->where('podcast_id', $podcast->id)->exists();
+        $podcast = $this->podcastService->storePodcast($user, $feed_url);
+        $podcast_is_now_followed = $user->podcasts()->where('podcast_id', $podcast->id)->exists();
 
-        $this->assertTrue($podcastIsNowFollowed);
+        $this->assertTrue($podcast_is_now_followed);
 
         $this->assertEquals('Test Podcast', $podcast->title);
         $this->assertEquals('A sample podcast feed', $podcast->description);
 
         Bus::assertDispatched(ProcessPodcastEpisodes::class);
+    }
+
+    #[Test]
+    public function itShouldNotCreatePodcastIfFeedsReturnsError()
+    {
+        $user = User::factory()->create();
+
+        $mock_feed = Mockery::mock(SimplePie::class, [
+            'get_title' => 'Test Podcast',
+            'get_description' => 'A sample podcast feed',
+            'get_author' => ['name' => 'John Doe'],
+            'get_link' => 'http://example.com',
+            'get_image_url' => 'http://example.com/image.jpg',
+            'error' => 'Some fake error',
+        ]);
+
+        $feed_url = 'http://newfeed.com/rss';
+
+        FeedsFacade::shouldReceive('make')
+            ->once()
+            ->with($feed_url)
+            ->andReturn($mock_feed);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(function ($message, $context) use ($feed_url) {
+                $is_correct_feed = $context['feed_url'] === $feed_url;
+                $is_correct_error = $context['message'] === 'Some fake error';
+
+                return $is_correct_feed && $is_correct_error;
+            });
+
+        $this->expectException(UnprocessableEntityHttpException::class);
+
+        $this->podcastService->storePodcast($user, $feed_url);
     }
 
     #[Test]
@@ -248,6 +288,69 @@ class PodcastServiceTest extends TestCase
         $this->expectException(UnprocessableEntityHttpException::class);
 
         $this->podcastService->storePodcast($user, 'http://invalidfeed.web/rss');
+    }
+
+    #[Test]
+    public function itShouldNotDispatchProcessPodcastJobForExistentFeeds()
+    {
+        Bus::fake();
+
+        $user = User::factory()->create();
+        $feed_url = Fake()->url();
+        Podcast::factory()->create([
+            'feed_url' => $feed_url,
+            'is_visible' => true
+        ]);
+
+        $this->podcastService->storePodcastInBackground($user, $feed_url);
+
+        Bus::assertNotDispatched(ProcessPodcast::class);
+    }
+
+    #[Test]
+    public function itShouldDispatchProcessPodcastJob()
+    {
+        Bus::fake();
+
+        $user = User::factory()->create();
+        $feed_url = Fake()->url();
+
+        $this->podcastService->storePodcastInBackground($user, $feed_url);
+
+        Bus::assertDispatchedTimes(ProcessPodcast::class, 1);
+    }
+
+    #[Test]
+    public function itShouldNotDispatchProcessPodcastJobForFeedsWithError()
+    {
+        $user = User::factory()->create();
+
+        $mock_feed = Mockery::mock(SimplePie::class, [
+            'get_title' => 'Test Podcast',
+            'get_description' => 'A sample podcast feed',
+            'get_author' => ['name' => 'John Doe'],
+            'get_link' => 'http://example.com',
+            'get_image_url' => 'http://example.com/image.jpg',
+            'error' => 'Some fake error',
+        ]);
+
+        $feed_url = 'http://newfeed.com/rss';
+
+        FeedsFacade::shouldReceive('make')
+            ->once()
+            ->with($feed_url)
+            ->andReturn($mock_feed);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(function ($message, $context) use ($feed_url) {
+                $is_correct_feed = $context['feed_url'] === $feed_url;
+                $is_correct_error = $context['message'] === 'Some fake error';
+
+                return $is_correct_feed && $is_correct_error;
+            });
+
+        $this->podcastService->storePodcastInBackground($user, $feed_url);
     }
 
     #[Test]
