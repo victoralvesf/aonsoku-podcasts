@@ -41,6 +41,8 @@ COPY ./.docker/php/memory-limit.ini /usr/local/etc/php/conf.d/
 
 # Queue Worker
 COPY ./.docker/supervisord.conf /etc/supervisord.conf
+RUN touch /var/log/queue.log \
+    && chmod 0644 /var/log/queue.log
 
 # Scheduler Crontab
 RUN mkdir -p /var/spool/cron/crontabs
