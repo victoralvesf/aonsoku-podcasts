@@ -1,11 +1,12 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "victoralvesf/aonsoku-podcast",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Aonsoku Podcast Management API.",
+    "version": "0.1.2",
     "keywords": [
-        "laravel",
-        "framework"
+        "aonsoku",
+        "podcast"
     ],
     "license": "MIT",
     "require": {
@@ -64,6 +65,9 @@
         ],
         "test-coverage-html": [
             "@php artisan test --coverage-html reports/"
+        ],
+        "get-version": [
+            "@php -r \"echo json_decode(file_get_contents('composer.json'))->version;\""
         ]
     },
     "extra": {
