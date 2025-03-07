@@ -17,8 +17,8 @@
   </p>
 
   [![Laravel][Laravel]][Laravel-url] [![PHP][PHP]][PHP-url]
-  [![API Docs][Docs-badge]][Docs-url]
-  [![Docker Images][Docker-Images-badge]][Docker-Images-url]
+  
+  [![API Docs][Docs-badge]][Docs-url] [![Docker Images][Docker-Images-badge]][Docker-Images-url]
 </div>
 
 <!-- TABLE OF CONTENTS -->
