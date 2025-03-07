@@ -35,7 +35,7 @@ case "$1" in
 
     queue)
         set_timezone
-        echo "Waiting 10 seconds..."
+        echo "Waiting for the App to start..."
         sleep 10
         echo "Starting the queue worker..."
         supervisord -c /etc/supervisord.conf &

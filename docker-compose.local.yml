@@ -1,20 +1,22 @@
 services:
-    # The main container must be specifically named "app"
     app:
-        image: ghcr.io/victoralvesf/aonsoku-podcasts:latest
+        build:
+            context: .
+            dockerfile: .docker/php/Dockerfile
+        image: aonsoku_podcasts
         container_name: aonsoku_podcasts
         depends_on:
             mysql:
                 condition: service_healthy
         env_file:
-            - .env.production
+            - .env
         command: [ "sh", "./aonsoku.sh", "start" ]
 
     nginx:
         image: nginx:alpine
         container_name: aonsoku_podcasts_nginx
         ports:
-            - "6060:80" # You can use any port other than 6060
+            - "6060:80"
         volumes:
             - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
         depends_on:
@@ -27,7 +29,7 @@ services:
             - MYSQL_DATABASE=${DB_DATABASE}
             - MYSQL_USER=${DB_USERNAME}
             - MYSQL_PASSWORD=${DB_PASSWORD}
-            - MYSQL_ROOT_PASSWORD=root-secret-key # Change this to a strong password
+            - MYSQL_ROOT_PASSWORD=eiYnEFIZkoug5z292J7isfMfQId3R9SBuAM
         volumes:
             - mysql_data:/var/lib/mysql
         healthcheck:
@@ -38,19 +40,19 @@ services:
             start_period: 0s
 
     queue:
-        image: ghcr.io/victoralvesf/aonsoku-podcasts:latest
+        image: aonsoku_podcasts
         container_name: aonsoku_podcasts_queue
         env_file:
-            - .env.production
+            - .env
         depends_on:
             - app
         command: [ "sh", "./aonsoku.sh", "queue" ]
 
     scheduler:
-        image: ghcr.io/victoralvesf/aonsoku-podcasts:latest
+        image: aonsoku_podcasts
         container_name: aonsoku_podcasts_scheduler
         env_file:
-            - .env.production
+            - .env
         depends_on:
             - app
         command: [ "sh", "./aonsoku.sh", "scheduler" ]
