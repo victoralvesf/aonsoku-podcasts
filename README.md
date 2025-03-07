@@ -2,9 +2,8 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/victoralvesf/aonsoku">
-    <img src="https://cdn.jsdelivr.net/gh/victoralvesf/aonsoku@main/public/favicons/android-chrome-192x192.png
-    " alt="Aonsoku Podcasts" width="80" height="80">
+  <a href="https://github.com/victoralvesf/aonsoku-podcasts">
+    <img src="https://cdn.jsdelivr.net/gh/victoralvesf/aonsoku@main/public/favicons/android-chrome-192x192.png" alt="Aonsoku" width="80" height="80">
   </a>
 
   <h3 align="center">Aonsoku Podcasts</h3>
