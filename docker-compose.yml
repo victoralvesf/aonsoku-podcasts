@@ -3,6 +3,8 @@ services:
     app:
         image: ghcr.io/victoralvesf/aonsoku-podcasts:latest
         container_name: aonsoku_podcasts
+        env_file:
+            - .env.production
         depends_on:
             mysql:
                 condition: service_healthy
@@ -38,6 +40,8 @@ services:
     queue:
         image: ghcr.io/victoralvesf/aonsoku-podcasts:latest
         container_name: aonsoku_podcasts_queue
+        env_file:
+            - .env.production
         depends_on:
             - app
         command: [ "sh", "./aonsoku.sh", "queue" ]
@@ -45,6 +49,8 @@ services:
     scheduler:
         image: ghcr.io/victoralvesf/aonsoku-podcasts:latest
         container_name: aonsoku_podcasts_scheduler
+        env_file:
+            - .env.production
         depends_on:
             - app
         command: [ "sh", "./aonsoku.sh", "scheduler" ]
