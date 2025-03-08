@@ -22,25 +22,24 @@
 </div>
 
 <!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#api-documentation">API Documentation</a>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-        <li><a href="#running">Running</a></li>
-        <li><a href="#environment-variables">Environment Variables</a></li>
-      </ul>
-    </li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-  </ol>
-</details>
+## Table of contents
+
+<ol>
+  <li>
+    <a href="#api-documentation">API Documentation</a>
+  </li>
+  <li>
+    <a href="#getting-started">Getting Started</a>
+    <ul>
+      <li><a href="#prerequisites">Prerequisites</a></li>
+      <li><a href="#installation">Installation</a></li>
+      <li><a href="#running">Running</a></li>
+      <li><a href="#environment-variables">Environment Variables</a></li>
+    </ul>
+  </li>
+  <li><a href="#contributing">Contributing</a></li>
+  <li><a href="#license">License</a></li>
+</ol>
 
 ## API Documentation
 
@@ -71,7 +70,7 @@ composer install
 cp .env.example .env
 ```
 4. Edit database config, if you don't want to use `sqlite`:
-```sh
+```dotenv
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -102,7 +101,7 @@ php artisan serve
 >
 > This will run the server, queue, scheduler and logs in parallel.
 
-8. Start the queue and schedule separated:
+8. Starting the queue and schedule separated:
 ```sh
 # queue
 php artisan queue:listen
@@ -132,21 +131,34 @@ cp .env.example .env.production
 
 > [!CAUTION]
 >
-> Ensure to update the `MYSQL_ROOT_PASSWORD` value in the `docker-compose.yml` file.
+> Ensure to fill the database settings. Example:
+>
+> ```dotenv
+> DB_CONNECTION=mysql
+> DB_HOST=mysql # needs to be mysql to work with docker compose.
+> DB_PORT=3306
+> DB_DATABASE=YourDatabaseName
+> DB_USERNAME=YourUsername
+> DB_PASSWORD=YourPassword
+> DB_ROOT_PASSWORD=YourRootUserPassword
+> ```
+>
+> Make sure to use `mysql` for `DB_QUEUE_CONNECTION` aswell.
 >
 > Additionally, generate a key for your `.env.production` file:
 >
+> If you have PHP installed:
 > ```
-> # If you have PHP and Composer installed:
 > php artisan key:generate --show  
 > ```
 > Copy the output and assign it to the `APP_KEY` environment variable.
 >
-> If PHP is not installed, you can generate a base64 string and use that instead.
+> If you don't have PHP installed, you can generate a base64 string in the following format: 
+> `base64:Mm4FpGq0LTkFymKOlziX0yJmGcV3CUiVNYpvRmj4W9s=`
 
 4. Start with Docker Compose
 ```sh
-docker compose up -d
+docker compose --env-file .env.production up -d
 ```
 
 #### Environment Variables
