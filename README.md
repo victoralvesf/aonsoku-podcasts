@@ -141,20 +141,18 @@ cp .env.example .env.production
 > DB_USERNAME=YourUsername
 > DB_PASSWORD=YourPassword
 > DB_ROOT_PASSWORD=YourRootUserPassword
-> ```
 >
-> Make sure to use `mysql` for `DB_QUEUE_CONNECTION` aswell.
+> # Make sure to set this to mysql aswell
+> DB_QUEUE_CONNECTION=mysql
+> ```
 >
 > Additionally, generate a key for your `.env.production` file:
 >
-> If you have PHP installed:
-> ```
-> php artisan key:generate --show  
-> ```
-> Copy the output and assign it to the `APP_KEY` environment variable.
+> If you don't have access to any Laravel project, you can obtain a random key on this page:
 >
-> If you don't have PHP installed, you can generate a base64 string in the following format: 
-> `base64:Mm4FpGq0LTkFymKOlziX0yJmGcV3CUiVNYpvRmj4W9s=`
+> https://laravel-encryption-key-generator.vercel.app/
+> 
+> Thanks to [Stefan Zweifel](https://github.com/stefanzweifel) for this helpful tool!
 
 4. Start with Docker Compose
 ```sh
