@@ -89,7 +89,7 @@ class PodcastForm
                         Placeholder::make('episode_count')
                             ->label('Episodes')
                             ->numeric()
-                            ->default(0),
+                            ->hiddenOn('create'),
                     ]),
             ]);
     }
