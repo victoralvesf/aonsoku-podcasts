@@ -15,6 +15,7 @@ class PodcastsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultPaginationPageOption(5)
             ->columns([
                 ImageColumn::make('image_url')
                     ->label('Image'),

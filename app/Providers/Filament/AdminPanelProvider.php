@@ -26,11 +26,14 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('/')
+            ->spa()
             ->login()
+            ->brandLogo(fn() => view('filament.admin.logo'))
             ->colors([
                 'primary' => Color::Emerald,
             ])
+            ->font('Poppins')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
