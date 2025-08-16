@@ -28,20 +28,24 @@ class PodcastsTable
                     ->hidden(),
                 TextColumn::make('link')
                     ->copyable()
+                    ->copyableState(fn(Podcast $record) => $record->link)
                     ->icon(Heroicon::ClipboardDocument)
                     ->limit(35)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('feed_url')
                     ->label('Feed URL')
                     ->copyable()
+                    ->copyableState(fn(Podcast $record) => $record->feed_url)
                     ->icon(Heroicon::ClipboardDocument)
                     ->limit(35),
                 IconColumn::make('is_visible')
                     ->label('Visible')
+                    ->trueColor('primary')
                     ->boolean(),
                 TextColumn::make('episode_count')
                     ->label('Episodes')
-                    ->numeric()
+                    ->icon(Heroicon::Signal)
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

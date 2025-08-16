@@ -2,17 +2,14 @@
 
 namespace App\Filament\Resources\Podcasts\Schemas;
 
-use Filament\Forms\Components\BaseFileUpload;
-use Filament\Forms\Components\FileUpload;
+use App\Form\ImageUpload;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PodcastForm
 {
@@ -30,9 +27,14 @@ class PodcastForm
                             ->required(),
                         TextInput::make('author')
                             ->required(),
-                        Textarea::make('description')
+                        RichEditor::make('description')
+                            ->toolbarButtons([
+                                ['bold', 'italic', 'underline', 'strike', 'subscript', 'superscript', 'link'],
+                                ['h2', 'h3', 'alignStart', 'alignCenter', 'alignEnd'],
+                                ['bulletList', 'orderedList'],
+                                ['undo', 'redo'],
+                            ])
                             ->required()
-                            ->rows(6)
                             ->columnSpanFull(),
                         TextInput::make('link')
                             ->label('Homepage URL')
@@ -46,35 +48,9 @@ class PodcastForm
                     ->columnSpan(1)
                     ->columns(1)
                     ->schema([
-                        FileUpload::make('image_url')
+                        ImageUpload::make('image_url')
                             ->hiddenLabel()
-                            ->image()
-                            ->disk('public')
-                            ->directory('podcasts')
-                            ->visibility('public')
-                            ->mutateDehydratedStateUsing(function (?string $state): ?string {
-                                if (blank($state)) {
-                                    return null;
-                                }
-
-                                if (Str::startsWith($state, ['http://', 'https://'])) {
-                                    return $state;
-                                }
-
-                                return Storage::disk('public')->url($state);
-                            })
-                            ->afterStateHydrated(static function (BaseFileUpload $component, string|array|null $state) {
-                                $appBaseUrl = rtrim(Storage::disk('public')->url('/'), '/');
-
-                                if (!blank($state) && Str::startsWith($state, needles: $appBaseUrl)) {
-                                    $state = Str::after($state, "$appBaseUrl/");
-
-                                    $component->state([((string) Str::uuid()) => $state]);
-                                    return;
-                                }
-
-                                $component->state([]);
-                            }),
+                            ->directory('podcasts'),
                     ]),
                 Section::make('Additional Info')
                     ->icon(Heroicon::InformationCircle)
@@ -91,7 +67,6 @@ class PodcastForm
                             ->icon(Heroicon::Signal)
                             ->label('Episodes')
                             ->badge()
-                            ->numeric()
                             ->hiddenOn('create'),
                     ]),
             ]);

@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->login()
             ->brandLogo(fn() => view('filament.admin.logo'))
+            ->brandName('Aonsoku Podcasts')
             ->colors([
                 'primary' => Color::Emerald,
             ])
