@@ -4,10 +4,10 @@ namespace App\Filament\Resources\Podcasts\Schemas;
 
 use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -78,16 +78,19 @@ class PodcastForm
                     ]),
                 Section::make('Additional Info')
                     ->icon(Heroicon::InformationCircle)
-                    ->columns(2)
+                    ->columns(3)
                     ->columnSpan(2)
                     ->schema([
                         Toggle::make('is_visible')
-                            ->belowLabel('Only visible podcasts will be listed by the API.')
-                            ->label('Visible')
+                            ->belowLabel('Make this podcast discoverable and accessible via the API.')
+                            ->label('Public')
                             ->default(false)
+                            ->columnSpan(2)
                             ->required(),
-                        Placeholder::make('episode_count')
+                        TextEntry::make('episode_count')
+                            ->icon(Heroicon::Signal)
                             ->label('Episodes')
+                            ->badge()
                             ->numeric()
                             ->hiddenOn('create'),
                     ]),
