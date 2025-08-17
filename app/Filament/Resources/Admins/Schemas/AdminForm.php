@@ -4,7 +4,10 @@ namespace App\Filament\Resources\Admins\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Hash;
 
 class AdminForm
 {
@@ -12,16 +15,35 @@ class AdminForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email()
-                    ->required(),
-                DateTimePicker::make('email_verified_at'),
-                TextInput::make('password')
-                    ->password()
-                    ->required(),
+                Section::make('User Info')
+                    ->icon(Heroicon::User)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->required(),
+                        TextInput::make('email')
+                            ->label('Email address')
+                            ->email()
+                            ->required()
+                            ->unique(ignoreRecord: true),
+                        DateTimePicker::make('email_verified_at')
+                            ->nullable()
+                            ->hidden(),
+                        TextInput::make('password')
+                            ->password()
+                            ->revealable()
+                            ->required(fn(string $operation): bool => $operation === 'create')
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                            ->dehydrated(fn(?string $state): bool => filled($state))
+                            ->same('password_confirmation'),
+                        TextInput::make('password_confirmation')
+                            ->password()
+                            ->revealable()
+                            ->label('Password Confirmation')
+                            ->requiredWith('password')
+                            ->dehydrated(false),
+                    ]),
             ]);
     }
 }

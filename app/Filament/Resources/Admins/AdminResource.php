@@ -25,6 +25,8 @@ class AdminResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    protected static ?string $modelLabel = 'User';
+
     public static function form(Schema $schema): Schema
     {
         return AdminForm::configure($schema);
