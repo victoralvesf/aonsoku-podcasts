@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Podcasts\RelationManagers;
 
+use App\Filament\Resources\Episodes\EpisodeResource;
 use App\Form\ImageUpload;
 use App\Form\TextEditor;
 use App\Models\Episode;
@@ -125,8 +126,14 @@ class EpisodesRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make()->requiresConfirmation(),
+                    EditAction::make()
+                        ->url(function (Episode $record): string {
+                            return EpisodeResource::getUrl('edit', [
+                                'record' => $record,
+                            ]);
+                        }),
+                    DeleteAction::make()
+                        ->requiresConfirmation(),
                 ])
             ])
             ->toolbarActions([]);
