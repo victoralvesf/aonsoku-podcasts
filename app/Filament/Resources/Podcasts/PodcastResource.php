@@ -14,10 +14,13 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class PodcastResource extends Resource
 {
     protected static ?string $model = Podcast::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Library';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Microphone;
 
