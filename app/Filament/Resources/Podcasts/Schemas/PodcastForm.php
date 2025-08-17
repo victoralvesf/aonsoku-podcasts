@@ -27,15 +27,15 @@ class PodcastForm
                             ->required(),
                         TextInput::make('author')
                             ->required(),
-                        TextEditor::make('description')
-                            ->required()
-                            ->columnSpanFull(),
                         TextInput::make('link')
                             ->label('Homepage URL')
                             ->default(''),
                         TextInput::make('feed_url')
                             ->label('Feed URL')
                             ->required(),
+                        TextEditor::make('description')
+                            ->required()
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Image')
                     ->icon(Heroicon::Photo)

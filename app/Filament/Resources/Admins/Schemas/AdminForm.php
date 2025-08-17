@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Admins\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -27,9 +26,6 @@ class AdminForm
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true),
-                        DateTimePicker::make('email_verified_at')
-                            ->nullable()
-                            ->hidden(),
                         TextInput::make('password')
                             ->password()
                             ->revealable()
