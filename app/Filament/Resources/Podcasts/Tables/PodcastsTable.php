@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Podcasts\Tables;
 
 use App\Models\Podcast;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -15,7 +17,6 @@ class PodcastsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultPaginationPageOption(5)
             ->columns([
                 ImageColumn::make('image_url')
                     ->label('Image'),
@@ -60,7 +61,10 @@ class PodcastsTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make()->requiresConfirmation(),
+                ])
             ])
             ->toolbarActions([]);
     }
