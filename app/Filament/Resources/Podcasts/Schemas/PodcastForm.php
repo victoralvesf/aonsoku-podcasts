@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Podcasts\Schemas;
 
 use App\Form\ImageUpload;
-use Filament\Forms\Components\RichEditor;
+use App\Form\TextEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
@@ -27,13 +27,7 @@ class PodcastForm
                             ->required(),
                         TextInput::make('author')
                             ->required(),
-                        RichEditor::make('description')
-                            ->toolbarButtons([
-                                ['bold', 'italic', 'underline', 'strike', 'subscript', 'superscript', 'link'],
-                                ['h2', 'h3', 'alignStart', 'alignCenter', 'alignEnd'],
-                                ['bulletList', 'orderedList'],
-                                ['undo', 'redo'],
-                            ])
+                        TextEditor::make('description')
                             ->required()
                             ->columnSpanFull(),
                         TextInput::make('link')

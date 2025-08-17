@@ -3,15 +3,16 @@
 namespace App\Filament\Resources\Podcasts\RelationManagers;
 
 use App\Form\ImageUpload;
+use App\Form\TextEditor;
 use App\Models\Episode;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
@@ -25,26 +26,34 @@ class EpisodesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
-                TextInput::make('title')
-                    ->required(),
-                TextInput::make('audio_url')
-                    ->required(),
-                TextInput::make('duration')
-                    ->required()
-                    ->numeric(),
-                DateTimePicker::make('published_at')
-                    ->required(),
-                ImageUpload::make('image_url')
-                    ->directory('episodes')
-                    ->columnSpanFull(),
-                RichEditor::make('description')
-                    ->toolbarButtons([
-                        ['bold', 'italic', 'underline', 'strike', 'subscript', 'superscript', 'link'],
-                        ['h2', 'h3', 'alignStart', 'alignCenter', 'alignEnd'],
-                        ['bulletList', 'orderedList'],
-                        ['undo', 'redo'],
-                    ])
+                Grid::make(2)
+                    ->schema([
+                        Grid::make(1)
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label('Episode Title')
+                                    ->required(),
+                                TextInput::make('audio_url')
+                                    ->label('Audio URL')
+                                    ->required(),
+                                Grid::make(3)
+                                    ->schema([
+                                        TextInput::make('duration')
+                                            ->required()
+                                            ->numeric(),
+                                        DateTimePicker::make('published_at')
+                                            ->label('Published At')
+                                            ->columnSpan(2)
+                                            ->required(),
+                                    ])
+                            ]),
+                        ImageUpload::make('image_url')
+                            ->label('Image')
+                            ->directory('episodes'),
+                    ]),
+                TextEditor::make('description')
                     ->required()
                     ->columnSpanFull(),
             ]);
