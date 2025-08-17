@@ -4,8 +4,8 @@ namespace App\Form;
 
 use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
-use Storage;
-use Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ImageUpload extends FileUpload
 {
