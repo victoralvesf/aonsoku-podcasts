@@ -15,6 +15,7 @@ class ImageUpload extends FileUpload
             ->image()
             ->disk('public')
             ->visibility('public')
+            ->required(fn(string $operation): bool => $operation === 'create')
             ->mutateDehydratedStateUsing(function (?string $state): ?string {
                 if (blank($state)) {
                     return null;
