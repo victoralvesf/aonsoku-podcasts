@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Exception;
 use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Support\Facades\Storage;
@@ -9,6 +10,9 @@ use Illuminate\Support\Str;
 
 class ImageUpload extends FileUpload
 {
+    /**
+     * @throws Exception
+     */
     public static function make(?string $name = null): static
     {
         return parent::make($name)
@@ -28,16 +32,24 @@ class ImageUpload extends FileUpload
                 return Storage::disk('public')->url($state);
             })
             ->afterStateHydrated(static function (BaseFileUpload $component, string|array|null $state) {
-                $appBaseUrl = rtrim(Storage::disk('public')->url('/'), '/');
-
-                if (!blank($state) && Str::startsWith($state, needles: $appBaseUrl)) {
-                    $state = Str::after($state, "$appBaseUrl/");
-
-                    $component->state([((string) Str::uuid()) => $state]);
-                    return;
+                if (blank($state)) {
+                    return $component->state([]);
                 }
 
-                $component->state([]);
+                $storageBaseUrl = Storage::disk('public')->url('');
+                $uuid           = Str::uuid()->toString();
+
+                if (is_string($state) && Str::startsWith($state, $storageBaseUrl)) {
+                    $state = Str::after($state, $storageBaseUrl);
+
+                    return $component->state([ $uuid => $state ]);
+                }
+
+                if (is_string($state) && Str::startsWith($state, ['http://', 'https://'])) {
+                    return $component->state([ $uuid => $state ]);
+                }
+
+                return $component->state([]);
             });
     }
 }
