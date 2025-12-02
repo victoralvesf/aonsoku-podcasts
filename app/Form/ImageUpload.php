@@ -17,9 +17,31 @@ class ImageUpload extends FileUpload
     {
         return parent::make($name)
             ->image()
+            ->openable()
+            ->panelAspectRatio('1:1')
             ->disk('public')
             ->visibility('public')
             ->required(fn(string $operation): bool => $operation === 'create')
+            // READ -> Ensure file upload load correctly external and internal URLs
+            ->getUploadedFileUsing(function (?string $file) {
+                if (blank($file)) {
+                    return null;
+                }
+
+                if (Str::startsWith($file, ['http://', 'https://'])) {
+                    return [
+                        'name' => basename($file),
+                        'url' => $file,
+                        'size' => 0,
+                    ];
+                }
+
+                return [
+                    'name' => basename($file),
+                    'url' => Storage::disk('public')->url($file),
+                ];
+            })
+            // DB WRITE -> Ensure we store the full URL in the database
             ->mutateDehydratedStateUsing(function (?string $state): ?string {
                 if (blank($state)) {
                     return null;
@@ -31,6 +53,7 @@ class ImageUpload extends FileUpload
 
                 return Storage::disk('public')->url($state);
             })
+            // HYDRATE -> Convert stored URL back to relative storage path for the component
             ->afterStateHydrated(static function (BaseFileUpload $component, string|array|null $state) {
                 if (blank($state)) {
                     return $component->state([]);
