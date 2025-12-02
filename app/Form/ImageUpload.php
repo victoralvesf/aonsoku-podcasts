@@ -31,7 +31,7 @@ class ImageUpload extends FileUpload
                 if (Str::startsWith($file, ['http://', 'https://'])) {
                     return [
                         'name' => basename($file),
-                        'url' => $file,
+                        'url' => route('proxy', ['url' => $file]),
                         'size' => 0,
                     ];
                 }
