@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Podcasts\Tables;
 
+use App\Jobs\UpdatePodcastEpisodes;
 use App\Models\Podcast;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -63,6 +65,11 @@ class PodcastsTable
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
+                    Action::make('updateEpisodes')
+                        ->label('Update Episodes')
+                        ->icon(Heroicon::ArrowPath)
+                        ->action(fn(Podcast $record) => UpdatePodcastEpisodes::dispatch($record))
+                        ->successNotificationTitle('Podcast episodes will be updated shortly.'),
                     DeleteAction::make()->requiresConfirmation(),
                 ])
             ])

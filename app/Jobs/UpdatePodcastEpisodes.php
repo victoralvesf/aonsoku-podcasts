@@ -15,7 +15,7 @@ class UpdatePodcastEpisodes implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
-    protected $podcast;
+    protected Podcast $podcast;
 
     /**
      * Create a new job instance.
@@ -48,7 +48,7 @@ class UpdatePodcastEpisodes implements ShouldQueue
                     if ($episodeExists) {
                         $consecutiveExistingCount++;
 
-                        // Stops foreach if find at least 3 existing episodes.
+                        // Stops foreach if it finds at least 3 existing episodes.
                         if ($consecutiveExistingCount >= 3) {
                             break;
                         }
