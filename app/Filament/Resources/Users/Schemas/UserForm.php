@@ -41,13 +41,6 @@ class UserForm
                                 return $tenant->getKey();
                             }),
                     ]),
-
-                Section::make('Podcasts')
-                    ->columnSpanFull()
-                    ->icon(Heroicon::Microphone)
-                    ->schema([
-                        // Additional podcast-related fields can be added here
-                    ]),
             ]);
     }
 }
