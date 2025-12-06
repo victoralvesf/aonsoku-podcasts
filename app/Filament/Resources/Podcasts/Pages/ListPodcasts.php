@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Podcasts\Pages;
 
+use App\Filament\Actions\ImportPodcast;
 use App\Filament\Resources\Podcasts\PodcastResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
@@ -13,6 +14,7 @@ class ListPodcasts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ImportPodcast::make(),
             CreateAction::make(),
         ];
     }

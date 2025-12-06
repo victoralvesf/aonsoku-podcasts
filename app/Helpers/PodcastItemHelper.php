@@ -9,7 +9,7 @@ use SimplePie\SimplePie;
 
 class PodcastItemHelper
 {
-    public static function formatEpisode(SimplePieItem $item, Podcast $podcast)
+    public static function formatEpisode(SimplePieItem $item, Podcast $podcast): array
     {
         return [
             'podcast_id' => $podcast->id,
@@ -22,22 +22,21 @@ class PodcastItemHelper
         ];
     }
 
-    public static function formatTitle(string $title)
+    public static function formatTitle(string $title): string
     {
         $formatted_title = html_entity_decode($title);
         $formatted_title = str_replace(["\n", "\r"], ' ', $formatted_title);
         $formatted_title = preg_replace('/\s+/', ' ', $formatted_title);
-        $formatted_title = trim($formatted_title);
 
-        return $formatted_title;
+        return trim($formatted_title);
     }
 
-    public static function getAudioUrl(SimplePieItem $item)
+    public static function getAudioUrl(SimplePieItem $item): string
     {
         $audio_url = null;
 
         foreach ($item->get_enclosures() as $enclosure) {
-            if (strpos($enclosure->get_type(), 'audio/') === 0) {
+            if (str_starts_with($enclosure->get_type(), 'audio/')) {
                 $audio_url = $enclosure->get_link();
                 break;
             }
@@ -63,7 +62,7 @@ class PodcastItemHelper
         return !empty($url) ? $url : $defaultImage;
     }
 
-    public static function getItunesDuration(SimplePieItem $item)
+    public static function getItunesDuration(SimplePieItem $item): int
     {
         $duration = $item->get_item_tags(SimplePie::NAMESPACE_ITUNES, 'duration');
 
@@ -82,15 +81,15 @@ class PodcastItemHelper
         return $item->get_date('Y-m-d H:i:s');
     }
 
-    public static function convertDurationToSeconds($duration)
+    public static function convertDurationToSeconds(string $duration): int
     {
         // If it's already a number (seconds), return it
         if (is_numeric($duration)) {
-            return $duration;
+            return (int) $duration;
         }
 
         // If it's a time string (HH:MM:SS or MM:SS)
-        if (strpos($duration, ':') !== false) {
+        if (str_contains($duration, ':')) {
             $parts = array_reverse(explode(':', $duration));
             $seconds = 0;
 
@@ -107,13 +106,13 @@ class PodcastItemHelper
                 $seconds += (int) $parts[2] * 3600;
             }
 
-            return $seconds;
+            return (int) $seconds;
         }
 
         return 0; // Return 0 if format is unrecognized
     }
 
-    public static function formatPodcast(SimplePie $feed, string $feed_url)
+    public static function formatPodcast(SimplePie $feed, string $feed_url): array
     {
         $title = self::formatTitle($feed->get_title());
         $description = self::formatTitle($feed->get_description() ?? '');
