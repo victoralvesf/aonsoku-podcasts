@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Admin extends Authenticable implements FilamentUser
@@ -42,5 +43,16 @@ class Admin extends Authenticable implements FilamentUser
             ->take(2)
             ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Get the total count of admins with caching.
+     */
+    public static function getCount(): int
+    {
+        $cacheKey = config('constants.cache.count.admin');
+        $tts      = config('constants.ONE_DAY_IN_SECONDS');
+
+        return Cache::remember($cacheKey, $tts, fn () => self::count());
     }
 }

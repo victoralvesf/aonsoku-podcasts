@@ -19,12 +19,14 @@ class StatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Podcasts count', Podcast::count())
+            Stat::make('Podcasts count', Podcast::getCount())
                 ->icon(Heroicon::Microphone),
-            Stat::make('Episodes count', Episode::count())
+            Stat::make('Episodes count', Episode::getCount())
                 ->icon(Heroicon::Signal),
-            Stat::make('Admins count', Admin::count())
+            Stat::make('Admins count', Admin::getCount())
                 ->icon(Heroicon::Users),
+            Stat::make('Users count', User::getCount())
+                ->icon(Heroicon::UserGroup),
         ];
     }
 }
