@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Filament\Resources\Podcasts\PodcastResource;
+use App\Models\Podcast;
 use Filament\Actions\AttachAction;
+use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 
@@ -26,6 +28,12 @@ class PodcastsRelationManager extends RelationManager
                     ->attachAnother(false)
                     ->preloadRecordSelect()
                     ->multiple(),
+            ])
+            ->recordActions([
+                DetachAction::make()
+                    ->label('Unfollow')
+                    ->modalHeading(fn (Podcast $record) => 'Unfollow ' . $record->title . '?')
+                    ->modalSubmitActionLabel('Unfollow'),
             ]);
     }
 }
