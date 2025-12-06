@@ -21,11 +21,11 @@ class AdminResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Management';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::User;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $modelLabel = 'User';
+    protected static ?string $modelLabel = 'Admin';
 
     public static function form(Schema $schema): Schema
     {

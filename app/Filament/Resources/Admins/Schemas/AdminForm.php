@@ -14,7 +14,7 @@ class AdminForm
     {
         return $schema
             ->components([
-                Section::make('User Info')
+                Section::make('Admin Info')
                     ->icon(Heroicon::User)
                     ->columnSpanFull()
                     ->columns(2)
