@@ -51,4 +51,9 @@ class PodcastResource extends Resource
             'edit' => EditPodcast::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::$model::getCount();
+    }
 }
