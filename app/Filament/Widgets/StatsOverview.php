@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Admin;
 use App\Models\Episode;
 use App\Models\Podcast;
+use App\Models\User;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -22,8 +23,8 @@ class StatsOverview extends StatsOverviewWidget
                 ->icon(Heroicon::Microphone),
             Stat::make('Episodes count', Episode::count())
                 ->icon(Heroicon::Signal),
-            Stat::make('Users count', Admin::count())
-                ->icon(Heroicon::UserGroup),
+            Stat::make('Admins count', Admin::count())
+                ->icon(Heroicon::Users),
         ];
     }
 }
