@@ -8,7 +8,7 @@ use function Knuckles\Scribe\Config\{removeStrategies, configureStrategy};
 // Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
 
 return [
-    'title' => config('app.name') . ' API Documentation',
+    'title' => 'Aonsoku Podcasts API Documentation',
 
     'description' => 'API for managing podcasts, episodes and tracking playback progress.',
 
@@ -54,6 +54,7 @@ return [
                 'expandAllResponses' => true,
                 'hideDarkModeToggle' => true,
                 'documentDownloadType' => 'none',
+                'showDeveloperTools' => 'never',
             ])),
         ]
     ],

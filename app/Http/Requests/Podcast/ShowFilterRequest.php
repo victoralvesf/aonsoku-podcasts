@@ -40,4 +40,26 @@ class ShowFilterRequest extends FormRequest
             'sort.in' => 'The selected sort is invalid. Valid values are: asc, desc.',
         ];
     }
+
+    public function queryParameters(): array
+    {
+        return [
+            'per_page' => [
+                'description' => 'The number of items per page. Min 10, Max 100.',
+                'example' => 15,
+            ],
+            'order_by' => [
+                'description' => 'The field to order by.',
+                'example' => 'published_at',
+            ],
+            'sort' => [
+                'description' => 'The sorting direction.',
+                'example' => 'desc',
+            ],
+            'page' => [
+                'description' => 'The page number.',
+                'example' => 1,
+            ],
+        ];
+    }
 }

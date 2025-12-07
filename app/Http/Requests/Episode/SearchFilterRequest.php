@@ -43,4 +43,34 @@ class SearchFilterRequest extends FormRequest
             'filter_by.in' => 'The selected filter_by is invalid. Valid values are: title, description, both.',
         ];
     }
+
+    public function queryParameters(): array
+    {
+        return [
+            'query' => [
+                'description' => 'The search term.',
+                'example' => 'Episode 14',
+            ],
+            'per_page' => [
+                'description' => 'The number of items per page. Min 10, Max 100.',
+                'example' => 15,
+            ],
+            'order_by' => [
+                'description' => 'The field to order by.',
+                'example' => 'published_at',
+            ],
+            'sort' => [
+                'description' => 'The sorting direction.',
+                'example' => 'desc',
+            ],
+            'filter_by' => [
+                'description' => 'The field to filter by.',
+                'example' => 'title',
+            ],
+            'page' => [
+                'description' => 'The page number.',
+                'example' => 1,
+            ],
+        ];
+    }
 }
