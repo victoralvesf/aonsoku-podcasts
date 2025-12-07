@@ -17,46 +17,52 @@ class EpisodeForm
     {
         return $schema
             ->columns(1)
-            ->components([
-                Grid::make(3)
-                    ->schema([
-                        Section::make('Episode Info')
-                            ->icon(Heroicon::InformationCircle)
-                            ->columns(1)
-                            ->columnSpan(2)
-                            ->schema([
-                                TextInput::make('title')
-                                    ->label('Episode Title')
-                                    ->required(),
-                                TextInput::make('audio_url')
-                                    ->label('Audio URL')
-                                    ->required(),
-                                Grid::make(2)
-                                    ->schema([
-                                        TextInput::make('duration')
-                                            ->required()
-                                            ->numeric(),
-                                        DateTimePicker::make('published_at')
-                                            ->label('Published At')
-                                            ->required(),
-                                    ])
-                            ]),
-                        Section::make('Image')
-                            ->icon(Heroicon::Photo)
-                            ->schema([
-                                ImageUpload::make('image_url')
-                                    ->hiddenLabel()
-                                    ->directory('episodes'),
-                            ])
-                    ]),
-                Section::make('Description')
-                    ->icon(Heroicon::DocumentText)
-                    ->schema([
-                        TextEditor::make('description')
-                            ->hiddenLabel()
-                            ->required()
-                            ->columnSpanFull()
-                    ])
-            ]);
+            ->components(self::formSchema());
+    }
+
+    public static function formSchema(): array
+    {
+        return [
+            Grid::make(3)
+                ->schema([
+                    Section::make('Episode Info')
+                        ->icon(Heroicon::InformationCircle)
+                        ->columns(1)
+                        ->columnSpan(2)
+                        ->schema([
+                            TextInput::make('title')
+                                ->label('Episode Title')
+                                ->required(),
+                            TextInput::make('audio_url')
+                                ->label('Audio URL')
+                                ->required(),
+                            Grid::make(2)
+                                ->schema([
+                                    TextInput::make('duration')
+                                        ->required()
+                                        ->numeric(),
+                                    DateTimePicker::make('published_at')
+                                        ->label('Published At')
+                                        ->native(false)
+                                        ->required(),
+                                ])
+                        ]),
+                    Section::make('Image')
+                        ->icon(Heroicon::Photo)
+                        ->schema([
+                            ImageUpload::make('image_url')
+                                ->hiddenLabel()
+                                ->directory('episodes'),
+                        ])
+                ]),
+            Section::make('Description')
+                ->icon(Heroicon::DocumentText)
+                ->schema([
+                    TextEditor::make('description')
+                        ->hiddenLabel()
+                        ->required()
+                        ->columnSpanFull()
+                ])
+        ];
     }
 }

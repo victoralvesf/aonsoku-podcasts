@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Podcasts\RelationManagers;
 
 use App\Filament\Resources\Episodes\EpisodeResource;
+use App\Filament\Resources\Episodes\Schemas\EpisodeForm;
 use App\Form\ImageUpload;
 use App\Form\TextEditor;
 use App\Models\Episode;
@@ -102,7 +103,10 @@ class EpisodesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->createAnother(false)
+                    ->schema(EpisodeForm::formSchema())
+                    ->slideOver(),
             ])
             ->recordActions([
                 ActionGroup::make([
