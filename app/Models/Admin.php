@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Observers\AdminObserver;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticable;
@@ -11,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
+#[ObservedBy([AdminObserver::class])]
 class Admin extends Authenticable implements FilamentUser
 {
     use HasFactory, Notifiable, HasUuids;
@@ -54,5 +57,11 @@ class Admin extends Authenticable implements FilamentUser
         $tts      = config('constants.ONE_DAY_IN_SECONDS');
 
         return Cache::remember($cacheKey, $tts, fn () => self::count());
+    }
+
+    public static function clearGetCountCache(): void
+    {
+        $cacheKey = config('constants.cache.count.admin');
+        Cache::forget($cacheKey);
     }
 }

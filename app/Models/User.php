@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\UserObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 
+#[ObservedBy([UserObserver::class])]
 class User extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
@@ -38,5 +41,11 @@ class User extends Model
         $tts      = config('constants.ONE_DAY_IN_SECONDS');
 
         return Cache::remember($cacheKey, $tts, fn () => self::count());
+    }
+
+    public static function clearGetCountCache(): void
+    {
+        $cacheKey = config('constants.cache.count.user');
+        Cache::forget($cacheKey);
     }
 }
