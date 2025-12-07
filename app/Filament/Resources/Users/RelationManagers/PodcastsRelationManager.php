@@ -7,6 +7,7 @@ use App\Models\Podcast;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Table;
 
 class PodcastsRelationManager extends RelationManager
@@ -26,6 +27,7 @@ class PodcastsRelationManager extends RelationManager
                     ->modalHeading('Follow a new Podcast')
                     ->modalSubmitActionLabel('Follow')
                     ->attachAnother(false)
+                    ->modalWidth(Width::Large)
                     ->preloadRecordSelect()
                     ->multiple(),
             ])

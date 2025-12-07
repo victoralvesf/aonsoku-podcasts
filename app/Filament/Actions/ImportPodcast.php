@@ -6,6 +6,7 @@ use App\Jobs\ProcessPodcast;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 
 class ImportPodcast extends Action
@@ -17,6 +18,7 @@ class ImportPodcast extends Action
             ->button()
             ->icon(Heroicon::CloudArrowDown)
             ->color('gray')
+            ->modalWidth(Width::Large)
             ->schema([
                 TextInput::make('url')
                     ->label('Feed URL')
