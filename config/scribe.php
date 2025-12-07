@@ -103,7 +103,7 @@ return [
         'order' => [],
     ],
 
-    'logo' => 'images/logo.png',
+    'logo' => null,
 
     'last_updated' => 'Last updated: {date:F j, Y}',
 

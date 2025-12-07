@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,6 +11,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -43,6 +45,13 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Library',
                 'Management',
+            ])
+            ->userMenuItems([
+                Action::make('api_docs')
+                    ->label('API Docs')
+                    ->icon(Heroicon::OutlinedBookOpen)
+                    ->url(fn (): string => route('scribe'))
+                    ->openUrlInNewTab(true),
             ])
             ->middleware([
                 EncryptCookies::class,
