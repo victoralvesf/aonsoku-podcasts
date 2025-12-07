@@ -84,27 +84,7 @@ class EpisodesRelationManager extends RelationManager
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->formatStateUsing(function (int $state) {
-                        if (!is_numeric($state) || $state < 0) {
-                            return $state;
-                        }
-
-                        $seconds = $state;
-
-                        if ($seconds < 3600) {
-                            $minutes = floor($seconds / 60);
-                            return sprintf('%dm', $minutes);
-                        }
-
-                        $hours = floor($seconds / 3600);
-                        $minutes = floor(($seconds % 3600) / 60);
-
-                        if ($minutes == 0) {
-                            return sprintf('%dh', $hours);
-                        }
-
-                        return sprintf('%dh %02dm', $hours, $minutes);
-                    }),
+                    ->formatStateUsing(fn (int $state) => $this->formatEpisodeDuration($state)),
                 TextColumn::make('published_at')
                     ->label('Published At')
                     ->dateTime()
@@ -137,5 +117,28 @@ class EpisodesRelationManager extends RelationManager
                 ])
             ])
             ->toolbarActions([]);
+    }
+
+    protected function formatEpisodeDuration(int $state): string
+    {
+        if (!is_numeric($state) || $state < 0) {
+            return $state;
+        }
+
+        $seconds = $state;
+
+        if ($seconds < 3600) {
+            $minutes = floor($seconds / 60);
+            return sprintf('%dm', $minutes);
+        }
+
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+
+        if ($minutes == 0) {
+            return sprintf('%dh', $hours);
+        }
+
+        return sprintf('%dh %02dm', $hours, $minutes);
     }
 }
