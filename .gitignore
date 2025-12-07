@@ -26,6 +26,8 @@ yarn-error.log
 /.vscode
 /.zed
 
+/.scribe
+
 .DS_Store
 
 _ide_helper.php
