@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Models\Tenant;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 
 class UserForm
@@ -33,6 +35,9 @@ class UserForm
                                     ->label('Server URL')
                                     ->required(),
                             ])
+                            ->createOptionAction(function (Action $action) {
+                                return $action->modalWidth(Width::Large);
+                            })
                             ->createOptionUsing(function (array $data) {
                                 $tenant = Tenant::create([
                                     'server_url' => $data['server_url'],
