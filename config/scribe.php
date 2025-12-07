@@ -52,6 +52,8 @@ return [
                 'defaultOpenAllTags' => true,
                 'hideClientButton' => true,
                 'expandAllResponses' => true,
+                'hideDarkModeToggle' => true,
+                'documentDownloadType' => 'none',
             ])),
         ]
     ],
@@ -100,7 +102,10 @@ return [
 
     'groups' => [
         'default' => 'Endpoints',
-        'order' => [],
+        'order' => [
+            'Podcasts',
+            'Episodes',
+        ],
     ],
 
     'logo' => null,

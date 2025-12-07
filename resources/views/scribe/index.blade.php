@@ -17,7 +17,7 @@
 <script
     id="api-reference"
     
-    data-configuration="{&quot;theme&quot;:&quot;deepSpace&quot;,&quot;defaultOpenAllTags&quot;:true,&quot;hideClientButton&quot;:true,&quot;expandAllResponses&quot;:true}"
+    data-configuration="{&quot;theme&quot;:&quot;deepSpace&quot;,&quot;defaultOpenAllTags&quot;:true,&quot;hideClientButton&quot;:true,&quot;expandAllResponses&quot;:true,&quot;hideDarkModeToggle&quot;:true,&quot;documentDownloadType&quot;:&quot;none&quot;}"
     data-url="{{ route("scribe.openapi") }}">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
