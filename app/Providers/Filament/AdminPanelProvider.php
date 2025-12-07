@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandLogo(fn() => view('filament.admin.logo'))
             ->brandName('Aonsoku Podcasts')
+            ->favicon(asset('images/logo.png'))
             ->colors([
                 'primary' => Color::Emerald,
             ])
