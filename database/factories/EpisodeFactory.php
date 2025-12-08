@@ -7,7 +7,7 @@ use App\Models\Podcast;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Episode>
+ * @extends Factory<Episode>
  */
 class EpisodeFactory extends Factory
 {

@@ -39,4 +39,26 @@ class SearchFilterRequest extends FormRequest
             'filter_by.in' => 'The selected filter_by is invalid. Valid values are: title, description, both.',
         ];
     }
+
+    public function queryParameters(): array
+    {
+        return [
+            'query' => [
+                'description' => 'The search term.',
+                'example' => 'tech',
+            ],
+            'per_page' => [
+                'description' => 'The number of items per page. Min 1, Max 50.',
+                'example' => 15,
+            ],
+            'filter_by' => [
+                'description' => 'The field to filter by.',
+                'example' => 'title',
+            ],
+            'page' => [
+                'description' => 'The page number.',
+                'example' => 1,
+            ],
+        ];
+    }
 }

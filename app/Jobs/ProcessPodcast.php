@@ -16,16 +16,16 @@ class ProcessPodcast implements ShouldQueue
 {
     use Queueable, Dispatchable;
 
-    protected User $user;
+    protected ?User $user;
     protected string $feed_url;
 
     /**
      * Create a new job instance.
      *
-     * @param User $user
+     * @param ?User $user
      * @param string $feed_url
      */
-    public function __construct(User $user, string $feed_url)
+    public function __construct(?User $user, string $feed_url)
     {
         $this->user = $user;
         $this->feed_url = $feed_url;
@@ -46,7 +46,8 @@ class ProcessPodcast implements ShouldQueue
 
             $formatted_podcast = PodcastItemHelper::formatPodcast($feed, $this->feed_url);
             $podcast = Podcast::create($formatted_podcast);
-            $this->user->podcasts()->attach($podcast->id);
+
+            $this->user?->podcasts()->attach($podcast->id);
 
             ProcessPodcastEpisodes::dispatch($podcast);
         } catch (\Exception $e) {

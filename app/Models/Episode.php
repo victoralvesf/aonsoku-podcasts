@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Observers\EpisodeObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
+#[ObservedBy([EpisodeObserver::class])]
 class Episode extends Model
 {
     use HasFactory, HasUuids;
@@ -41,5 +45,23 @@ class Episode extends Model
     public function playback(): HasMany
     {
         return $this->hasMany(EpisodePlayback::class);
+    }
+
+    /**
+     * Get the total count of episodes with caching.
+     */
+    public static function getCount(): int
+    {
+        $cacheKey = config('constants.cache.count.episode');
+        $tts      = config('constants.ONE_DAY_IN_SECONDS');
+
+        return Cache::remember($cacheKey, $tts, fn () => self::count());
+    }
+
+    public static function clearGetCountCache(): void
+    {
+        $cacheKey = config('constants.cache.count.episode');
+
+        Cache::forget($cacheKey);
     }
 }

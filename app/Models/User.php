@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Observers\UserObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
+#[ObservedBy([UserObserver::class])]
 class User extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'username',
@@ -25,5 +30,22 @@ class User extends Model
     public function podcasts(): BelongsToMany
     {
         return $this->belongsToMany(Podcast::class, 'user_podcast');
+    }
+
+    /**
+     * Get the total count of users with caching.
+     */
+    public static function getCount(): int
+    {
+        $cacheKey = config('constants.cache.count.user');
+        $tts      = config('constants.ONE_DAY_IN_SECONDS');
+
+        return Cache::remember($cacheKey, $tts, fn () => self::count());
+    }
+
+    public static function clearGetCountCache(): void
+    {
+        $cacheKey = config('constants.cache.count.user');
+        Cache::forget($cacheKey);
     }
 }

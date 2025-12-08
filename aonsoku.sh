@@ -25,6 +25,8 @@ case "$1" in
         set_timezone
         echo "Running migrations..."
         php artisan migrate --force
+        echo "Seeding default user..."
+        php artisan db:seed
         echo "Caching config..."
         php artisan config:cache
         echo "Caching routes..."
