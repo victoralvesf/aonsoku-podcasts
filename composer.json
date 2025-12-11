@@ -3,14 +3,14 @@
     "name": "victoralvesf/aonsoku-podcasts",
     "type": "project",
     "description": "Podcast Management API for Aonsoku.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "keywords": [
         "aonsoku",
         "podcast"
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "filament/filament": "^4.2",
         "knuckleswtf/scribe": "^5.6",
         "laravel/framework": "^11.31",
