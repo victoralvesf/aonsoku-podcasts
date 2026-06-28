@@ -21,7 +21,7 @@ return [
     | Life of cache, in seconds
     |
     */
-    'cache.life'               => 3600,
+    'cache.life'               => env('FEED_CACHE_LIFE', 3600),
 
     /*
     |--------------------------------------------------------------------------
@@ -31,7 +31,7 @@ return [
     | Whether to disable the cache.
     |
     */
-    'cache.disabled'           => false,
+    'cache.disabled'           => env('FEED_CACHE_DISABLED', false),
 
     /*
     |--------------------------------------------------------------------------
