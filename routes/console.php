@@ -3,4 +3,4 @@
 use App\Jobs\TriggerPodcastsUpdate;
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::job(new TriggerPodcastsUpdate)->everyTwoHours();
+Schedule::job(new TriggerPodcastsUpdate)->hourly();
