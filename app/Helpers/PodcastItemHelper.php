@@ -24,11 +24,16 @@ class PodcastItemHelper
 
     public static function formatTitle(string $title): string
     {
-        $formatted_title = html_entity_decode($title);
-        $formatted_title = str_replace(["\n", "\r"], ' ', $formatted_title);
-        $formatted_title = preg_replace('/\s+/', ' ', $formatted_title);
+        $decoded = $title;
+        do {
+            $previous = $decoded;
+            $decoded = html_entity_decode($previous, ENT_QUOTES | ENT_HTML5);
+        } while ($decoded !== $previous);
 
-        return trim($formatted_title);
+        $decoded = str_replace(["\n", "\r"], ' ', $decoded);
+        $decoded = preg_replace('/\s+/', ' ', $decoded);
+
+        return trim($decoded);
     }
 
     public static function getAudioUrl(SimplePieItem $item): string
