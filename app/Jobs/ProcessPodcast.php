@@ -38,6 +38,10 @@ class ProcessPodcast implements ShouldQueue
     public function handle(): void
     {
         try {
+            if ($this->batch()?->cancelled()) {
+                return;
+            }
+
             $feed = FeedsFacade::make($this->feed_url);
 
             $error = $feed->error();
@@ -50,7 +54,13 @@ class ProcessPodcast implements ShouldQueue
 
             $this->user?->podcasts()->attach($podcast->id);
 
-            $this->batch()->add([new ProcessPodcastEpisodes($podcast)]);
+            $next = new ProcessPodcastEpisodes($podcast);
+
+            if ($this->batch()) {
+                $this->batch()->add([$next]);
+            } else {
+                dispatch($next);
+            }
         } catch (\Exception $e) {
             Log::error('[ProcessPodcastJob] - Error reading the feed.', [
                 'feed_url' => $this->feed_url,
