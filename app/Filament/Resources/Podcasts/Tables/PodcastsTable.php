@@ -13,12 +13,14 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
 
 class PodcastsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->poll(fn () => self::getPollValue())
             ->columns([
                 ImageColumn::make('image_url')
                     ->label('Image'),
@@ -74,5 +76,12 @@ class PodcastsTable
                 ])
             ])
             ->toolbarActions([]);
+    }
+
+    protected static function getPollValue(): string|null
+    {
+        $key = Podcast::IMPORT_CACHE_KEY . auth()->id();
+
+        return Cache::has($key) ? '3s' : null;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Podcast\GetAllFilterRequest;
 use App\Http\Requests\Podcast\SearchFilterRequest;
 use App\Http\Requests\Podcast\ShowFilterRequest;
+use App\Http\Requests\Podcast\StorePodcastRequest;
 use App\Services\PodcastService;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ use Illuminate\Http\Request;
  */
 class PodcastController extends Controller
 {
-    protected $podcastService;
+    protected PodcastService $podcastService;
 
     public function __construct(PodcastService $podcastService)
     {
@@ -164,30 +165,24 @@ class PodcastController extends Controller
      *   }
      * }
      */
-    public function store(Request $request)
+    public function store(StorePodcastRequest $request)
     {
-        $validated = $request->validate([
-            'feed_url' => 'nullable|string|url|required_without:feed_urls',
-            'feed_urls' => 'nullable|array|required_without:feed_url',
-            'feed_urls.*' => 'url',
-        ]);
-
+        $validated = $request->validated();
         $user = $request->user;
 
-        if (!empty($validated['feed_url'])) {
+        if (data_get($validated, 'feed_url')) {
             $podcast = $this->podcastService->storePodcast($user, $validated['feed_url']);
+
             return response()->json($podcast, 201);
         }
 
-        if (!empty($validated['feed_urls'])) {
-            foreach ($validated['feed_urls'] as $feedUrl) {
-                $this->podcastService->storePodcastInBackground($user, $feedUrl);
-            }
-            $response = [
-                'message' => 'Processing started. They will be available in just a few minutes!'
-            ];
-            return response()->json($response, 202);
+        foreach ($validated['feed_urls'] as $feedUrl) {
+            $this->podcastService->storePodcastInBackground($user, $feedUrl);
         }
+
+        return response()->json([
+            'message' => 'Processing started. They will be available in just a few minutes!'
+        ], 202);
     }
 
     /**

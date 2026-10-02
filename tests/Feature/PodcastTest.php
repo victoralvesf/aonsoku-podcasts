@@ -387,11 +387,51 @@ class PodcastTest extends TestCase
         $url = route('podcasts.store');
         $body = ['feed_urls' => [
             'testpodcast.com/feed',
-            'http://test.com/feed',
+            'https://test.com/feed',
+            'non_existing_feed',
+            123,
+            'https://newfeed.com/rss',
+            false,
         ]];
         $response = $this->postJson($url, $body, $this->headers);
 
+        $response->assertOnlyJsonValidationErrors(
+            ['feed_urls.0', 'feed_urls.2', 'feed_urls.3', 'feed_urls.5']
+        );
+    }
+
+    #[Test]
+    public function itShouldNotAllowEmptyFeedUrls()
+    {
+        $url = route('podcasts.store');
+        $body = ['feed_urls' => []];
+        $response = $this->postJson($url, $body, $this->headers);
+
+        $response->assertJsonValidationErrorFor('feed_urls');
+    }
+
+    #[Test]
+    public function itShouldNotAllowEmptyStringsOnFeedUrls()
+    {
+        $url = route('podcasts.store');
+        $body = ['feed_urls' => ['']];
+        $response = $this->postJson($url, $body, $this->headers);
+
         $response->assertJsonValidationErrorFor('feed_urls.0');
+    }
+
+    #[Test]
+    public function itShouldNotAllowBothFeedUrlAndFeedUrls()
+    {
+        $url = route('podcasts.store');
+        $body = [
+            'feed_url' => 'https://newfeed.com/rss',
+            'feed_urls' => ['https://feed.newfeed.com/rss'],
+        ];
+        $response = $this->postJson($url, $body, $this->headers);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['feed_url', 'feed_urls']);
     }
 
     #[Test]

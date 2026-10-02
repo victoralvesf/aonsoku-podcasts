@@ -16,6 +16,8 @@ class Podcast extends Model
 {
     use HasFactory, HasUuids;
 
+    public const string IMPORT_CACHE_KEY = 'podcast-import:';
+
     protected $fillable = [
         'title',
         'description',

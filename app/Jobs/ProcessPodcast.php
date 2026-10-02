@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\PodcastItemHelper;
 use App\Models\Podcast;
 use App\Models\User;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -14,7 +15,7 @@ use willvincent\Feeds\Facades\FeedsFacade;
 
 class ProcessPodcast implements ShouldQueue
 {
-    use Queueable, Dispatchable;
+    use Queueable, Dispatchable, Batchable;
 
     protected ?User $user;
     protected string $feed_url;
@@ -37,6 +38,10 @@ class ProcessPodcast implements ShouldQueue
     public function handle(): void
     {
         try {
+            if ($this->batch()?->cancelled()) {
+                return;
+            }
+
             $feed = FeedsFacade::make($this->feed_url);
 
             $error = $feed->error();
@@ -49,7 +54,13 @@ class ProcessPodcast implements ShouldQueue
 
             $this->user?->podcasts()->attach($podcast->id);
 
-            ProcessPodcastEpisodes::dispatch($podcast);
+            $next = new ProcessPodcastEpisodes($podcast);
+
+            if ($this->batch()) {
+                $this->batch()->add([$next]);
+            } else {
+                dispatch($next);
+            }
         } catch (\Exception $e) {
             Log::error('[ProcessPodcastJob] - Error reading the feed.', [
                 'feed_url' => $this->feed_url,

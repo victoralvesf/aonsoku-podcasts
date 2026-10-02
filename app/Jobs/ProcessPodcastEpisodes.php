@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\PodcastItemHelper;
 use App\Models\Episode;
 use App\Models\Podcast;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -15,9 +16,9 @@ use willvincent\Feeds\Facades\FeedsFacade;
 
 class ProcessPodcastEpisodes implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
 
-    protected $podcast;
+    protected Podcast $podcast;
 
     /**
      * Create a new job instance.
@@ -62,7 +63,7 @@ class ProcessPodcastEpisodes implements ShouldQueue
 
             Podcast::where('id', $this->podcast->id)->update(['is_visible' => true]);
         } catch (\Exception $e) {
-            Log::error('Error processing job processing for podcast episodes', [
+            Log::error('Error processing podcast episodes', [
                 'id' => $this->podcast->id,
                 'title' => $this->podcast->title,
                 'error' => $e->getMessage(),

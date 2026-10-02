@@ -9,6 +9,7 @@ use App\Jobs\ProcessPodcast;
 use App\Jobs\ProcessPodcastEpisodes;
 use App\Models\Podcast;
 use App\Models\User;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use willvincent\Feeds\Facades\FeedsFacade;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class PodcastService
 {
-    public function getPodcasts(User $user, array $filters)
+    public function getPodcasts(User $user, array $filters): Paginator
     {
         $filters = new FilterHelper($filters, FilterType::Podcast);
 
@@ -27,7 +28,7 @@ class PodcastService
             ->simplePaginate($filters->getPerPage());
     }
 
-    public function getPodcastWithEpisodes(User $user, string $podcastId, array $filters)
+    public function getPodcastWithEpisodes(User $user, string $podcastId, array $filters): array
     {
         $userFollowsThePodcast = $user->podcasts()->where('podcast_id', $podcastId)->exists();
 
@@ -99,7 +100,7 @@ class PodcastService
         }
     }
 
-    public function storePodcastInBackground(User $user, string $feed_url)
+    public function storePodcastInBackground(User $user, string $feed_url): void
     {
         $podcast = Podcast::where('feed_url', $feed_url)->first();
 
@@ -108,7 +109,7 @@ class PodcastService
         }
     }
 
-    public function destroyPodcast(User $user, string $podcastId)
+    public function destroyPodcast(User $user, string $podcastId): void
     {
         $podcastIsLinked = $user->podcasts()->where('podcast_id', $podcastId)->exists();
 

@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Podcasts\Pages;
 
+use App\Filament\Actions\CreateIconAction;
 use App\Filament\Actions\ImportPodcast;
 use App\Filament\Actions\UpdatePodcasts;
 use App\Filament\Resources\Podcasts\PodcastResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPodcasts extends ListRecords
@@ -17,7 +17,7 @@ class ListPodcasts extends ListRecords
         return [
             UpdatePodcasts::make(),
             ImportPodcast::make(),
-            CreateAction::make(),
+            CreateIconAction::make(),
         ];
     }
 }
